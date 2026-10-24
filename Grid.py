@@ -1,4 +1,5 @@
 import random
+import re
 
 from Cell import Cell
 from Ship import Ship
@@ -19,10 +20,25 @@ class Grid:
         # Liste de listes créée dans __init__ : chaque grille a ses propres cases
         self.cells = [[Cell(row, col) for col in range(size)] for row in range(size)]
 
+    def contains(self, row: int, col: int) -> bool:
+        """Indique si la position (row, col) est dans la grille."""
+        return 0 <= row < self.size and 0 <= col < self.size
+
+    def parse_position(self, text: str) -> tuple[int, int]:
+        """Convertit une coordonnée saisie (ex. "B7") en (row, col) : l'inverse de str(cell)."""
+        match = re.fullmatch(r"([A-Z])(\d{1,2})", text.strip().upper())
+        if match is None:
+            raise ValueError(f"<< {text.strip()} >> n'est pas une coordonnée (ex. B7)")
+        row = int(match.group(2)) - 1
+        col = ord(match.group(1)) - ord('A')
+        if not self.contains(row, col):
+            raise ValueError(f"{match.group(0)} est hors de la grille")
+        return row, col
+
     def __getitem__(self, position: tuple[int, int]) -> Cell:
         """Accès par grid[row, col] (≈ indexeur this[int row, int col] en C#)."""
         row, col = position
-        if not (0 <= row < self.size and 0 <= col < self.size):
+        if not self.contains(row, col):
             raise IndexError(f"Position ({row}, {col}) hors de la grille")
         return self.cells[row][col]
 
@@ -41,7 +57,7 @@ class Grid:
         d_row, d_col = (0, 1) if horizontal else (1, 0)
         end_row = row + d_row * (ship.length - 1)
         end_col = col + d_col * (ship.length - 1)
-        if not (0 <= row and 0 <= col and end_row < self.size and end_col < self.size):
+        if not (self.contains(row, col) and self.contains(end_row, end_col)):
             raise ValueError(f"{ship} déborderait de la grille")
         cells = [self[row + d_row * i, col + d_col * i] for i in range(ship.length)]
         if any(cell.has_ship for cell in cells):
