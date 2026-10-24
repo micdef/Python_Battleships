@@ -1,8 +1,9 @@
-from Fleet import Fleet
-from Grid import Grid
-from console_ui import place_manually
+from ComputerPlayer import ComputerPlayer
+from HumanPlayer import HumanPlayer
+from console_ui import show_grids
 
 if __name__ == "__main__":
-    mine = Grid()
-    place_manually(mine, Fleet())
-    print("\n".join(mine.render(reveal=True)))
+    human, computer = HumanPlayer("Michaël"), ComputerPlayer("Ordinateur")
+    for player in (human, computer):
+        player.place_fleet()  # même appel, comportement différent selon le joueur
+    show_grids(human.grid, computer.grid)
