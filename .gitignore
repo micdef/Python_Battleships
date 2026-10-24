@@ -1,0 +1,9 @@
+# Environnement virtuel Python : propre à chaque poste, recréé localement
+.venv/
+
+# Bytecode généré automatiquement par Python
+__pycache__/
+*.py[cod]
+
+# Configuration locale de l'éditeur (PyCharm)
+.idea/
