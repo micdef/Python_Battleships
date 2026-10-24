@@ -28,7 +28,7 @@ class Grid:
         """Convertit une coordonnée saisie (ex. "B7") en (row, col) : l'inverse de str(cell)."""
         match = re.fullmatch(r"([A-Z])(\d{1,2})", text.strip().upper())
         if match is None:
-            raise ValueError(f"<< {text.strip()} >> n'est pas une coordonnée (ex. B7)")
+            raise ValueError(f"« {text.strip()} » n'est pas une coordonnée (ex. B7)")
         row = int(match.group(2)) - 1
         col = ord(match.group(1)) - ord('A')
         if not self.contains(row, col):

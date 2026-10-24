@@ -12,7 +12,7 @@ def parse_placement(text: str, grid: Grid) -> tuple[int, int, bool]:
     row, col = grid.parse_position(parts[0])
     direction = parts[1].upper()
     if direction not in ("H", "V"):
-        raise ValueError("Le sens doit être H (horizontal), V (vertical)")
+        raise ValueError("Le sens doit être H (horizontal) ou V (vertical)")
     return row, col, direction == "H"
 
 
@@ -27,4 +27,4 @@ def place_manually(grid: Grid, fleet: Fleet, read: Callable[[str], str] = input)
                 grid.place(ship, row, col, horizontal=horizontal)
                 break
             except ValueError as error:
-                print(f"Refusé: {error}\n")
+                print(f"Refusé : {error}\n")
