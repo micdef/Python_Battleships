@@ -20,7 +20,7 @@ modification ou redistribution nécessite l'accord préalable de l'auteur.
 - [x] Bateaux et flottes configurables (flotte classique par défaut)
 - [x] Placement automatique de la flotte
 - [x] Placement manuel
-- [ ] Joueur humain contre l'ordinateur
+- [x] Joueur humain contre l'ordinateur
 - [ ] Boucle de jeu et conditions de victoire
 
 ## Lancer le projet

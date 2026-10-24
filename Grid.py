@@ -1,6 +1,8 @@
 import random
 import re
 
+from collections.abc import Callable
+
 from Cell import Cell
 from Ship import Ship
 from Fleet import Fleet
@@ -42,11 +44,16 @@ class Grid:
             raise IndexError(f"Position ({row}, {col}) hors de la grille")
         return self.cells[row][col]
 
-    def render(self, *, reveal: bool = False) -> list[str]:
-        """Renvoie les lignes de la grille ; reveal=True pour la vue du propriétaire."""
+    def render(self, *, reveal: bool = False, style: Callable[[Cell, str], str] | None = None) -> list[str]:
+        """Renvoie les lignes de la grille ; reveal=True pour la vue du propriétaire.
+           style, fourni par l'interface, peut habiller chaque symbole (couleurs...) sans que la grille le sache.
+        """
         lines = ["   " + " ".join(chr(ord("A") + col) for col in range(self.size))]
         for number, row in enumerate(self.cells, start=1):
-            symbols = (cell.own_symbol if reveal else cell.enemy_symbol for cell in row)
+            symbols = []
+            for cell in row:
+                symbol = cell.own_symbol if reveal else cell.enemy_symbol
+                symbols.append(style(cell, symbol) if style else symbol)
             lines.append(f"{number:>2} " + " ".join(symbols))
         return lines
 

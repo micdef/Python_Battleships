@@ -6,4 +6,4 @@ if __name__ == "__main__":
     human, computer = HumanPlayer("Michaël"), ComputerPlayer("Ordinateur")
     for player in (human, computer):
         player.place_fleet()  # même appel, comportement différent selon le joueur
-    show_grids(human.grid, computer.grid)
+    show_grids(human.grid, human.fleet, computer.grid)
