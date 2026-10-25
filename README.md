@@ -8,15 +8,16 @@ Avec ce projet, j'apprends la programmation orientée objet en Python. Je viens 
 J'aime les jeux de société et j'ai envie de les faire découvrir à mon fils sur ordinateur :
 la bataille navale m'a semblé une bonne mise en bouche.
 
-## Fonctionnalités (V1)
+## Fonctionnalités
 
-- Partie contre l'ordinateur ; le premier tireur est tiré au sort
-- Placement de la flotte automatique ou manuel
-- Écran rafraîchi à chaque tour : vos bateaux (une couleur par bateau) et vos tirs côte à côte,
+- 1.0 - Partie contre l'ordinateur ; le premier tireur est tiré au sort
+- 1.0 - Placement de la flotte automatique ou manuel
+- 1.0 - Écran rafraîchi à chaque tour : vos bateaux (une couleur par bateau) et vos tirs côte à côte,
   avec en dessous les derniers coups joués
-- Annonces « À l'eau », « Touché », « Coulé » (avec le nom du bateau coulé)
-- Historique complet de la partie affiché à la fin
-- Flottes configurables dans le code (flotte classique par défaut)
+- 1.0 - Annonces « À l'eau », « Touché », « Coulé » (avec le nom du bateau coulé)
+- 1.0 - Historique complet de la partie affiché à la fin
+- 1.0 - Flottes configurables dans le code (flotte classique par défaut)
+- 1.1 - Mode spectateur : regarder une partie entre deux ordinateurs
 
 ## Lancer le jeu
 
