@@ -2,7 +2,7 @@
 
 import pytest
 
-from Cell import Cell
+from battleships.cell import Cell
 
 
 def test_new_cell_is_untouched_water():

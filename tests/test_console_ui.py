@@ -2,7 +2,7 @@
 
 import pytest
 
-from console_ui import (
+from battleships.console_ui import (
     ANSI_CODE,
     announce_shot,
     ask_delay,
@@ -16,10 +16,10 @@ from console_ui import (
     show_history,
     visible_len,
 )
-from Fleet import Fleet
-from Grid import Grid
-from Player import ShotResult
-from ShotRecord import ShotRecord
+from battleships.fleet import Fleet
+from battleships.grid import Grid
+from battleships.player import ShotResult
+from battleships.shot_record import ShotRecord
 
 
 @pytest.mark.parametrize(("text", "expected"), [("B7 H", (6, 1, True)), (" a1   v ", (0, 0, False))])

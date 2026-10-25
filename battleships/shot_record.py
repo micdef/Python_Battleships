@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from Player import ShotResult
+from battleships.player import ShotResult
 
 
 @dataclass(frozen=True)

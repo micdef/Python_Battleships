@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from Ship import Ship
+from battleships.ship import Ship
 
 
 @dataclass(frozen=True)
