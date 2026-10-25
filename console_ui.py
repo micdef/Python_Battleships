@@ -1,3 +1,5 @@
+"""Interface console : saisies du joueur, couleurs, affichage des grilles, annonces et historique."""
+
 import re
 import time
 from collections.abc import Callable
@@ -24,6 +26,7 @@ def ship_colorizer(fleet: Fleet) -> Callable[[Cell, str], str]:
     colors = {ship: SHIP_COLORS[index % len(SHIP_COLORS)] for index, ship in enumerate(fleet)}
 
     def style(cell: Cell, symbol: str) -> str:
+        """Colore le symbole d’une case de bateau ; les autres cases restent inchangées."""
         return f"{colors[cell.ship]}{symbol}{RESET}" if cell.has_ship else symbol
 
     return style
@@ -120,6 +123,7 @@ def refresh_screen(own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
 
 
 def announce_start(first: Player) -> None:
+    """Met en attente l’annonce du tirage au sort, affichée au prochain rafraîchissement."""
     _pending_messages.append(f"Tirage au sort : {first} commence.")
 
 
@@ -130,6 +134,7 @@ def format_shot(record: ShotRecord) -> str:
 
 
 def announce_shot(record: ShotRecord) -> None:
+    """Met en attente l’annonce d’un tir, affichée au prochain rafraîchissement."""
     _pending_messages.append(format_shot(record))
 
 
@@ -187,6 +192,7 @@ def spectator_view(left: Player, right: Player, delay: float) -> Callable[[ShotR
     """Renvoie l'observateur qui, après chaque tir, réaffiche les deux grilles dévoilées puis marque une pause."""
 
     def show(record: ShotRecord) -> None:
+        """Après chaque tir : réaffiche les deux flottes dévoilées et le dernier tir, puis marque la pause."""
         print(CLEAR_SCREEN, end="")
         print_side_by_side(f"{left} :", _revealed_grid(left), f"{right} :", _revealed_grid(right))
         print()

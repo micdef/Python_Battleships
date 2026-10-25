@@ -1,3 +1,5 @@
+"""Point d’entrée du jeu (python main.py) : choix du mode, puis lancement de la partie."""
+
 from ComputerPlayer import ComputerPlayer
 from Game import Game
 from HumanPlayer import HumanPlayer

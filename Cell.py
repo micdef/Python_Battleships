@@ -1,3 +1,6 @@
+"""Une case de la grille : son contenu (eau ou bateau), les tirs reçus et ses deux affichages."""
+
+
 class Cell:
     """Une case de la grille : sait si elle porte un bateau et si elle a reçu un tir."""
 
@@ -9,6 +12,7 @@ class Cell:
     UNKNOWN = "."
 
     def __init__(self, row: int, col: int) -> None:
+        """Crée une case vide (de l’eau), jamais visée, à la position (row, col)."""
         # Attributs d'instance : propres à chaque case
         self.row = row
         self.col = col
@@ -17,6 +21,7 @@ class Cell:
 
     @property
     def has_ship(self) -> bool:
+        """Indique si un bateau occupe la case."""
         return self.ship is not None
 
     def shoot(self) -> bool:
@@ -41,10 +46,10 @@ class Cell:
         return Cell.UNKNOWN
 
     def __str__(self) -> str:
-        # Coordonnée lisible par le joueur, ex. "B7" (colonne en lettre, ligne à partir de 1)
+        """Coordonnée lisible par le joueur, ex. « B7 » (colonne en lettre, ligne à partir de 1). Remplace le commentaire."""
         return f"{chr(ord('A') + self.col)}{self.row + 1}"
 
     def __repr__(self) -> str:
-        # Représentation pour le débogueur PyCharm
+        """Représentation pour le débogueur ; le bateau est nommé, pas développé (pas de récursion avec Ship). Remplace le commentaire."""
         ship_name = self.ship.name if self.has_ship else None
         return f"Cell(row={self.row}, col={self.col}, ship={ship_name!r}, hit={self.hit})"
