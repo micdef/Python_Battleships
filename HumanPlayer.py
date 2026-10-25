@@ -2,19 +2,24 @@
 
 from collections.abc import Callable
 
+from console_ui import ask_automatic_placement, ask_target, place_manually, refresh_screen
 from Fleet import Fleet, ShipType
 from Grid import Grid
 from Player import Player
-from console_ui import ask_automatic_placement, ask_target, place_manually, refresh_screen
 
 
 class HumanPlayer(Player):
     """Le joueur humain, en console : il choisit son placement et ses tirs au clavier."""
 
-    def __init__(self, name: str, grid_size: int = Grid.DEFAULT_SIZE, ship_types: tuple[ShipType, ...] = Fleet.CLASSIC,
-                 read: Callable[[str], str] = input) -> None:
+    def __init__(
+        self,
+        name: str,
+        grid_size: int = Grid.DEFAULT_SIZE,
+        ship_types: tuple[ShipType, ...] = Fleet.CLASSIC,
+        read: Callable[[str], str] = input,
+    ) -> None:
         """Crée le joueur humain.
-           read est la source des saisies (le clavier par défaut, une fausse saisie dans les tests).
+        read est la source des saisies (le clavier par défaut, une fausse saisie dans les tests).
         """
         super().__init__(name, grid_size, ship_types)
         self.read = read  # source des saisies : le clavier, ou une fonction de test

@@ -1,7 +1,8 @@
 """Tests de la flotte : règle classique, variantes, numérotation et état « détruite »."""
 
-import pytest
 from dataclasses import FrozenInstanceError
+
+import pytest
 
 from Fleet import Fleet, ShipType
 from Grid import Grid
@@ -10,9 +11,13 @@ from Grid import Grid
 def test_default_fleet_is_the_classic_one():
     """Sans règle donnée, la flotte est la flotte classique."""
     fleet = Fleet()
-    assert [(ship.name, ship.length) for ship in fleet] == [("Porte-Avions", 5), ("Croiseur", 4),
-                                                            ("Contre-Torpilleur", 3), ("Sous-Marin", 3),
-                                                            ("Torpilleur", 2)]
+    assert [(ship.name, ship.length) for ship in fleet] == [
+        ("Porte-Avions", 5),
+        ("Croiseur", 4),
+        ("Contre-Torpilleur", 3),
+        ("Sous-Marin", 3),
+        ("Torpilleur", 2),
+    ]
 
 
 def test_fleet_is_iterable_and_has_a_length():

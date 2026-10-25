@@ -1,4 +1,5 @@
 """Tests d'un bateau : sa longueur, son placement et son état « coulé »."""
+
 import pytest
 
 from Grid import Grid

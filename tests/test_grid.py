@@ -1,4 +1,5 @@
 """Tests de la grille : taille, accès aux cases, lecture des coordonnées et affichage."""
+
 import pytest
 
 from Grid import Grid

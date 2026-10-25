@@ -1,8 +1,9 @@
 """Tests de la partie : tirage au sort, tours alternés, victoire, historique et observateur."""
 
-import pytest
 from dataclasses import FrozenInstanceError
 from itertools import pairwise
+
+import pytest
 
 from ComputerPlayer import ComputerPlayer
 from Game import Game

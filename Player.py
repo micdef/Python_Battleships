@@ -9,6 +9,7 @@ from Grid import Grid
 
 class ShotResult(Enum):
     """Résultat d'un tir, tel qu'il est annoncé au tireur."""
+
     MISS = "À l'eau"
     HIT = "Touché"
     SUNK = "Coulé"
@@ -17,9 +18,10 @@ class ShotResult(Enum):
 class Player(ABC):
     """Un joueur : possède sa grille et sa flotte ; sa façon de jouer est définie par les sous-classes."""
 
-    def __init__(self, name: str, grid_size: int = Grid.DEFAULT_SIZE,
-                 ship_types: tuple[ShipType, ...] = Fleet.CLASSIC) -> None:
-        """	Crée un joueur avec sa propre grille et sa propre flotte, selon les réglages de la partie."""
+    def __init__(
+        self, name: str, grid_size: int = Grid.DEFAULT_SIZE, ship_types: tuple[ShipType, ...] = Fleet.CLASSIC
+    ) -> None:
+        """Crée un joueur avec sa propre grille et sa propre flotte, selon les réglages de la partie."""
         self.name = name
         self.grid = Grid(grid_size)
         self.fleet = Fleet(ship_types)

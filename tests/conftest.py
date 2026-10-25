@@ -6,8 +6,9 @@ le test ait un paramètre du même nom (comme l'injection de dépendances, mais 
 """
 
 import random
-import pytest
 from collections.abc import Callable
+
+import pytest
 
 import console_ui
 
