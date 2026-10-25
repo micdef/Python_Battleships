@@ -1,4 +1,5 @@
 import re
+import time
 from collections.abc import Callable
 from itertools import zip_longest
 
@@ -142,11 +143,54 @@ def show_history(history: tuple[ShotRecord, ...]) -> None:
         print(f"{number:>3}. {format_shot(first):<{width}}   {right}")
 
 
+def _revealed_grid(player: Player) -> list[str]:
+    """Grille complète d'un joueur, bateaux visibles et en couleurs (fin de partie, spectateur)."""
+    return player.grid.render(reveal=True, style=ship_colorizer(player.fleet))
+
+
 def announce_winner(winner: Player, loser: Player, history: tuple[ShotRecord, ...]) -> None:
     """Écran final : derniers tirs, vainqueur, les deux grilles dévoilées et l'historique de la partie."""
     print(CLEAR_SCREEN, end="")
     _flush_messages()
     print(f"\n{winner} a gagné !")
-    print_side_by_side(f"{winner} :", winner.grid.render(reveal=True, style=ship_colorizer(winner.fleet)),
-                       f"{loser} :", loser.grid.render(reveal=True, style=ship_colorizer(loser.fleet)))
+    print_side_by_side(f"{winner} :", _revealed_grid(winner), f"{loser} :", _revealed_grid(loser))
     show_history(history)
+
+
+def ask_watch_mode(read: Callable[[str], str] = input) -> bool:
+    """Demande le mode de jeu ; True pour regarder une partie entre deux ordinateurs."""
+    while True:
+        answer = read("1. Jouer contre l'ordinateur\n2. Regarder une partie ordinateur contre ordinateur\nVotre choix : ")
+        if answer.strip() in ("1", "2"):
+            return answer.strip() == "2"
+        print("Refusé : répondez 1 ou 2\n")
+
+
+def ask_delay(read: Callable[[str], str] = input) -> float:
+    """Demande la pause entre deux tirs, en secondes (0,5 par défaut, 0 à 5 acceptés)."""
+    while True:
+        answer = read(
+            "Pause entre deux tirs, en secondes (Entrée = 0,5) (Min: 0,0 - Max 5,0) : ").strip().replace(",", ".")
+        if not answer:
+            return 0.5
+        try:
+            delay = float(answer)
+        except ValueError:
+            print("Refusé : donnez un nombre (ex. 0,5)\n")
+            continue
+        if 0 <= delay <= 5:
+            return delay
+        print("Refusé : la pause doit être comprise entre 0,0 et 5,0 secondes\n")
+
+
+def spectator_view(left: Player, right: Player, delay: float) -> Callable[[ShotRecord], None]:
+    """Renvoie l'observateur qui, après chaque tir, réaffiche les deux grilles dévoilées puis marque une pause."""
+
+    def show(record: ShotRecord) -> None:
+        print(CLEAR_SCREEN, end="")
+        print_side_by_side(f"{left} :", _revealed_grid(left), f"{right} :", _revealed_grid(right))
+        print()
+        _flush_messages()
+        time.sleep(delay)
+
+    return show
