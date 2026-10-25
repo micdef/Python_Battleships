@@ -3,7 +3,7 @@ from collections.abc import Callable
 from Fleet import Fleet, ShipType
 from Grid import Grid
 from Player import Player
-from console_ui import ask_automatic_placement, ask_target, place_manually
+from console_ui import ask_automatic_placement, ask_target, place_manually, refresh_screen
 
 
 class HumanPlayer(Player):
@@ -21,4 +21,5 @@ class HumanPlayer(Player):
             place_manually(self.grid, self.fleet, self.read)
 
     def choose_target(self, enemy_grid: Grid) -> tuple[int, int]:
+        refresh_screen(self.grid, self.fleet, enemy_grid)  # l'humain voit ses deux grilles avant de viser
         return ask_target(enemy_grid, self.read)

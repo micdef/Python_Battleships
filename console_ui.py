@@ -1,14 +1,21 @@
 import re
 from collections.abc import Callable
+from itertools import zip_longest
 
 from Cell import Cell
 from Fleet import Fleet
 from Grid import Grid
+from Player import Player
+from ShotRecord import ShotRecord
 
 # Codes couleur ANSI : une couleur par bateau sur sa propre grille (le rouge reste libre pour plus tard)
 RESET = "\033[0m"
 SHIP_COLORS = ("\033[94m", "\033[92m", "\033[93m", "\033[95m", "\033[96m", "\033[33m")
 ANSI_CODE = re.compile(r"\x1b\[[0-9;]*m")
+CLEAR_SCREEN = "\033[H\033[2J\033[3J"  # curseur en haut à gauche, efface l'écran puis l'historique de défilement
+
+# Annonces en attente : affichées sous les grilles au prochain rafraîchissement de l'écran
+_pending_messages: list[str] = []
 
 
 def ship_colorizer(fleet: Fleet) -> Callable[[Cell, str], str]:
@@ -74,11 +81,72 @@ def ask_target(enemy_grid: Grid, read: Callable[[str], str] = input) -> tuple[in
             print(f"Refusé : {error}\n")
 
 
-def show_grids(own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
-    """Affiche côte à côte sa grille de bateaux (en couleurs) et sa grille de tirs (vue adverse), avec leurs titres."""
-    left = ["Bateaux :"] + own_grid.render(reveal=True, style=ship_colorizer(own_fleet))
-    right = ["Tirs :"] + enemy_grid.render()
+def print_side_by_side(left_title: str, left_lines: list[str], right_title: str, right_lines: list[str]) -> None:
+    """Affiche deux blocs de lignes côte à côte, chacun sous son titre, en ignorant les codes couleur."""
+    left = [left_title] + left_lines
+    right = [right_title] + right_lines
     width = max(visible_len(line) for line in left)  # largeur de la colonne de gauche, titre compris
     for left_line, right_line in zip(left, right):
         padding = " " * (width - visible_len(left_line))
         print(f"{left_line}{padding}      {right_line}")
+
+
+def show_grids(own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
+    """Affiche côte à côte sa grille de bateaux (en couleurs) et sa grille de tirs (vue adverse), avec leurs titres."""
+    print_side_by_side("Bateaux :", own_grid.render(reveal=True, style=ship_colorizer(own_fleet)),
+                       "Tirs :", enemy_grid.render())
+
+
+def ask_name(read: Callable[[str], str] = input) -> str:
+    """Demande le nom du joueur ; « Joueur » si la saisie est vide."""
+    return read("Votre nom : ").strip() or "Joueur"
+
+
+def _flush_messages() -> None:
+    """Affiche les annonces en attente, puis les oublie."""
+    for message in _pending_messages:
+        print(message)
+    _pending_messages.clear()
+
+
+def refresh_screen(own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
+    """Efface l'écran et réaffiche les deux grilles, avec dessous les annonces depuis le dernier affichage."""
+    print(CLEAR_SCREEN, end="")
+    show_grids(own_grid, own_fleet, enemy_grid)
+    print()
+    _flush_messages()
+    print()
+
+
+def announce_start(first: Player) -> None:
+    _pending_messages.append(f"Tirage au sort : {first} commence.")
+
+
+def format_shot(record: ShotRecord) -> str:
+    """Texte d'un coup joué, identique dans les annonces et dans l'historique."""
+    detail = f" ({record.sunk_ship})" if record.sunk_ship else ""
+    return f"{record.shooter} tire en {record.position} : {record.result.value}{detail}"
+
+
+def announce_shot(record: ShotRecord) -> None:
+    _pending_messages.append(format_shot(record))
+
+
+def show_history(history: tuple[ShotRecord, ...]) -> None:
+    """Affiche tous les coups de la partie, un tour par ligne (le premier tireur à gauche)."""
+    print("\nHistorique de la partie :")
+    first_shots, second_shots = history[0::2], history[1::2]
+    width = max(len(format_shot(record)) for record in first_shots)
+    for number, (first, second) in enumerate(zip_longest(first_shots, second_shots), start=1):
+        right = format_shot(second) if second else ""
+        print(f"{number:>3}. {format_shot(first):<{width}}   {right}")
+
+
+def announce_winner(winner: Player, loser: Player, history: tuple[ShotRecord, ...]) -> None:
+    """Écran final : derniers tirs, vainqueur, les deux grilles dévoilées et l'historique de la partie."""
+    print(CLEAR_SCREEN, end="")
+    _flush_messages()
+    print(f"\n{winner} a gagné !")
+    print_side_by_side(f"{winner} :", winner.grid.render(reveal=True, style=ship_colorizer(winner.fleet)),
+                       f"{loser} :", loser.grid.render(reveal=True, style=ship_colorizer(loser.fleet)))
+    show_history(history)
