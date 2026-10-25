@@ -61,7 +61,7 @@ def test_hit_ship_cannot_be_removed():
         grid.remove(ship)
 
 
-def test_random_placement_always_places_the_whole_classic_feet():
+def test_random_placement_always_places_the_whole_classic_fleet():
     for _ in range(100):
         grid, fleet = Grid(), Fleet()
         grid.place_randomly(fleet)
