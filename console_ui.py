@@ -90,7 +90,7 @@ def print_side_by_side(left_title: str, left_lines: list[str], right_title: str,
     left = [left_title] + left_lines
     right = [right_title] + right_lines
     width = max(visible_len(line) for line in left)  # largeur de la colonne de gauche, titre compris
-    for left_line, right_line in zip(left, right):
+    for left_line, right_line in zip(left, right, strict=True):
         padding = " " * (width - visible_len(left_line))
         print(f"{left_line}{padding}      {right_line}")
 

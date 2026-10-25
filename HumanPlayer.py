@@ -13,7 +13,9 @@ class HumanPlayer(Player):
 
     def __init__(self, name: str, grid_size: int = Grid.DEFAULT_SIZE, ship_types: tuple[ShipType, ...] = Fleet.CLASSIC,
                  read: Callable[[str], str] = input) -> None:
-        """Crée le joueur humain ; read est la source des saisies (le clavier par défaut, une fausse saisie dans les tests)."""
+        """Crée le joueur humain.
+           read est la source des saisies (le clavier par défaut, une fausse saisie dans les tests).
+        """
         super().__init__(name, grid_size, ship_types)
         self.read = read  # source des saisies : le clavier, ou une fonction de test
 

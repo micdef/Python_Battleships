@@ -2,6 +2,7 @@
 
 import pytest
 from dataclasses import FrozenInstanceError
+from itertools import pairwise
 
 from ComputerPlayer import ComputerPlayer
 from Game import Game
@@ -37,7 +38,7 @@ def test_history_alternates_shooters_and_ends_with_the_winning_shot(capsys):
     game = Game(ComputerPlayer("A"), ComputerPlayer("B"))
     winner = game.play()
     shooters = [record.shooter for record in game.history]
-    assert all(current != following for current, following in zip(shooters, shooters[1:]))
+    assert all(current != following for current, following in pairwise(shooters))
     assert game.history[-1].shooter == winner.name
     assert game.history[-1].result is ShotResult.SUNK
 

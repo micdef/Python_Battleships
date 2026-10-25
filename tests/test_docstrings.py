@@ -1,7 +1,6 @@
 """Contrat de documentation : chaque module, classe et fonction du projet explique son utilité dans une docstring."""
 
 import ast
-from operator import and_
 
 import pytest
 from pathlib import Path
