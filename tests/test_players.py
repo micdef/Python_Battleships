@@ -63,26 +63,26 @@ def test_computer_only_targets_cells_never_shot():
     assert ComputerPlayer("Tireur").choose_target(enemy.grid) == (cells[-1].row, cells[-1].col)
 
 
-def test_human_can_choose_automatic_placement_after_a_typo(keyboard, capsys):
+def test_human_can_choose_automatic_placement_after_a_typo(console, capsys):
     """Une réponse invalide est refusée, puis le placement automatique est accepté."""
-    human = HumanPlayer("Michaël", read=keyboard("x", "A"))
+    human = HumanPlayer("Michaël", console("x", "A"))
     human.place_fleet()
     assert all(ship.is_placed for ship in human.fleet)
     assert "Refusé : répondez A ou M" in capsys.readouterr().out
 
 
-def test_human_can_place_manually(keyboard):
+def test_human_can_place_manually(console):
     """Le joueur peut placer ses bateaux lui-même au clavier."""
-    human = HumanPlayer("Michael", ship_types=(ShipType("Torpilleur", 2),), read=keyboard("M", "A1 V"))
+    human = HumanPlayer("Michael", console("M", "A1 V"), ship_types=(ShipType("Torpilleur", 2),))
     human.place_fleet()
     assert [str(cell) for cell in human.fleet.ships[0].cells] == ["A1", "A2"]
 
 
-def test_human_target_refuses_invalid_or_already_shot_cells(keyboard, capsys):
+def test_human_target_refuses_invalid_or_already_shot_cells(console, capsys):
     """Le joueur ne peut viser ni une case hors grille, ni une case déjà visée."""
     enemy = ComputerPlayer("Cible")
     enemy.grid[6, 1].shoot()
-    human = HumanPlayer("Michaël", read=keyboard("B7", "Z9", "C3"))
+    human = HumanPlayer("Michaël", console("B7", "Z9", "C3"))
     assert human.choose_target(enemy.grid) == (2, 2)
     output = capsys.readouterr().out
     assert "B7 a déjà été visée" in output
