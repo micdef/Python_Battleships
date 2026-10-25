@@ -3,9 +3,9 @@
 import random
 from collections.abc import Callable
 
-from console_ui import announce_shot, announce_start, announce_winner
-from Player import Player, ShotResult
-from ShotRecord import ShotRecord
+from battleships.console_ui import announce_shot, announce_start, announce_winner
+from battleships.player import Player, ShotResult
+from battleships.shot_record import ShotRecord
 
 
 class Game:

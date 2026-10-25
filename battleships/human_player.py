@@ -2,10 +2,10 @@
 
 from collections.abc import Callable
 
-from console_ui import ask_automatic_placement, ask_target, place_manually, refresh_screen
-from Fleet import Fleet, ShipType
-from Grid import Grid
-from Player import Player
+from battleships.console_ui import ask_automatic_placement, ask_target, place_manually, refresh_screen
+from battleships.fleet import Fleet, ShipType
+from battleships.grid import Grid
+from battleships.player import Player
 
 
 class HumanPlayer(Player):

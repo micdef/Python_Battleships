@@ -4,9 +4,9 @@ import random
 
 import pytest
 
-from Fleet import Fleet, ShipType
-from Grid import Grid
-from Ship import Ship
+from battleships.fleet import Fleet, ShipType
+from battleships.grid import Grid
+from battleships.ship import Ship
 
 
 def occupied(grid: Grid) -> list[str]:

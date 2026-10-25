@@ -5,11 +5,11 @@ from itertools import pairwise
 
 import pytest
 
-from ComputerPlayer import ComputerPlayer
-from Game import Game
-from HumanPlayer import HumanPlayer
-from Player import ShotResult
-from ShotRecord import ShotRecord
+from battleships.computer_player import ComputerPlayer
+from battleships.game import Game
+from battleships.human_player import HumanPlayer
+from battleships.player import ShotResult
+from battleships.shot_record import ShotRecord
 
 
 def test_players_must_have_grids_of_the_same_size():

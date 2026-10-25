@@ -10,7 +10,7 @@ from collections.abc import Callable
 
 import pytest
 
-import console_ui
+from battleships import console_ui
 
 
 @pytest.fixture(autouse=True)

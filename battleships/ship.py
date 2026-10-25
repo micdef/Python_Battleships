@@ -1,6 +1,6 @@
 """Un bateau : sa longueur, les cases qu’il occupe et son état « coulé »."""
 
-from Cell import Cell
+from battleships.cell import Cell
 
 
 class Ship:

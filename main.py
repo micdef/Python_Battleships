@@ -1,9 +1,9 @@
 """Point d’entrée du jeu (python main.py) : choix du mode, puis lancement de la partie."""
 
-from ComputerPlayer import ComputerPlayer
-from console_ui import ask_delay, ask_name, ask_watch_mode, spectator_view
-from Game import Game
-from HumanPlayer import HumanPlayer
+from battleships.computer_player import ComputerPlayer
+from battleships.console_ui import ask_delay, ask_name, ask_watch_mode, spectator_view
+from battleships.game import Game
+from battleships.human_player import HumanPlayer
 
 if __name__ == "__main__":
     try:

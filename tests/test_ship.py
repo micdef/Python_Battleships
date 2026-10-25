@@ -2,8 +2,8 @@
 
 import pytest
 
-from Grid import Grid
-from Ship import Ship
+from battleships.grid import Grid
+from battleships.ship import Ship
 
 
 @pytest.mark.parametrize("length", [0, -1])

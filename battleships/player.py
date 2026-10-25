@@ -3,8 +3,8 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from Fleet import Fleet, ShipType
-from Grid import Grid
+from battleships.fleet import Fleet, ShipType
+from battleships.grid import Grid
 
 
 class ShotResult(Enum):

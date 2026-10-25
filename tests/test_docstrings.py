@@ -6,7 +6,9 @@ from pathlib import Path
 import pytest
 
 PROJECT_ROOT = Path(__file__).parent.parent
-SOURCE_FILES = sorted(PROJECT_ROOT.glob("*.py")) + sorted((PROJECT_ROOT / "tests").glob("*.py"))
+SOURCE_FILES = [
+    path for folder in ("", "battleships", "tests") for path in sorted((PROJECT_ROOT / folder).glob("*.py"))
+]
 
 
 def missing_docstrings(path: Path) -> list[str]:
