@@ -2,12 +2,24 @@
 
 import pytest
 
+from console_ui import (
+    ANSI_CODE,
+    announce_shot,
+    ask_delay,
+    ask_name,
+    ask_watch_mode,
+    format_shot,
+    parse_placement,
+    print_side_by_side,
+    refresh_screen,
+    ship_colorizer,
+    show_history,
+    visible_len,
+)
 from Fleet import Fleet
 from Grid import Grid
 from Player import ShotResult
 from ShotRecord import ShotRecord
-from console_ui import (ANSI_CODE, announce_shot, ask_delay, ask_name, ask_watch_mode, format_shot, parse_placement,
-                        print_side_by_side, refresh_screen, ship_colorizer, show_history, visible_len)
 
 
 @pytest.mark.parametrize(("text", "expected"), [("B7 H", (6, 1, True)), (" a1   v ", (0, 0, False))])
@@ -16,8 +28,9 @@ def test_parse_placement_reads_position_and_direction(text, expected):
     assert parse_placement(text, Grid()) == expected
 
 
-@pytest.mark.parametrize(("text", "message"), [("B7", "Format"), ("B7 H V", "Format"), ("B7 X", "sens"),
-                                               ("Z1 H", "hors")])
+@pytest.mark.parametrize(
+    ("text", "message"), [("B7", "Format"), ("B7 H V", "Format"), ("B7 X", "sens"), ("Z1 H", "hors")]
+)
 def test_parse_placement_refuses_invalid_text(text, message):
     """Une saisie de placement incomplète, au sens inconnu ou hors grille est refusée."""
     with pytest.raises(ValueError, match=message):
@@ -57,11 +70,10 @@ def test_side_by_side_stays_aligned_with_colors(capsys):
     """Les couleurs ne décalent pas la grille de droite."""
     grid, fleet = Grid(), Fleet()
     grid.place_randomly(fleet)
-    print_side_by_side("Bateaux :", grid.render(reveal=True, style=ship_colorizer(fleet)),
-                       "Tirs :", grid.render())
+    print_side_by_side("Bateaux :", grid.render(reveal=True, style=ship_colorizer(fleet)), "Tirs :", grid.render())
     lines = ANSI_CODE.sub("", capsys.readouterr().out).splitlines()
     right_column = len(lines[0]) - len("Tirs :")
-    assert all(line[right_column - 6:right_column] == " " * 6 for line in lines)
+    assert all(line[right_column - 6 : right_column] == " " * 6 for line in lines)
 
 
 def test_format_shot_names_the_sunk_ship():
@@ -72,8 +84,11 @@ def test_format_shot_names_the_sunk_ship():
 
 def test_history_keeps_the_winning_shot_when_the_count_is_odd(capsys):
     """Le premier tireur qui gagne a tiré une fois de plus : zip_longest ne doit pas perdre ce dernier coup."""
-    history = (ShotRecord("A", "A1", ShotResult.MISS), ShotRecord("B", "B1", ShotResult.MISS),
-               ShotRecord("A", "C1", ShotResult.SUNK, "Torpilleur"))
+    history = (
+        ShotRecord("A", "A1", ShotResult.MISS),
+        ShotRecord("B", "B1", ShotResult.MISS),
+        ShotRecord("A", "C1", ShotResult.SUNK, "Torpilleur"),
+    )
     show_history(history)
     assert "A tire en C1 : Coulé (Torpilleur)" in capsys.readouterr().out
 

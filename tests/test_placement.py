@@ -1,6 +1,7 @@
 """Tests des placements : manuel (tout ou rien), retrait, et placement automatique de la flotte."""
 
 import random
+
 import pytest
 
 from Fleet import Fleet, ShipType
@@ -23,10 +24,15 @@ def test_ship_is_placed_to_the_right_or_downwards(horizontal, expected):
     assert set(occupied(grid)) == set(expected)
 
 
-@pytest.mark.parametrize(("row", "col", "horizontal", "message"), [(0, 8, True, "déborderait"),
-                                                                   (8, 0, False, "déborderait"),
-                                                                   (-1, 0, True, "déborderait"),
-                                                                   (0, 1, False, "chevaucherait")])
+@pytest.mark.parametrize(
+    ("row", "col", "horizontal", "message"),
+    [
+        (0, 8, True, "déborderait"),
+        (8, 0, False, "déborderait"),
+        (-1, 0, True, "déborderait"),
+        (0, 1, False, "chevaucherait"),
+    ],
+)
 def test_refused_placement_leaves_the_grid_unchanged(row, col, horizontal, message):
     """Tout ou rien : un placement refusé ne doit occuper aucune case."""
     grid = Grid()
@@ -89,7 +95,7 @@ def test_fleet_largen_than_the_grid_is_refused():
 
 
 def test_fleet_already_placed_is_refused():
-    """	Une flotte déjà placée ne peut pas être replacée automatiquement."""
+    """Une flotte déjà placée ne peut pas être replacée automatiquement."""
     grid, fleet = Grid(), Fleet()
     grid.place_randomly(fleet)
     with pytest.raises(ValueError, match="déjà"):

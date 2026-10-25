@@ -8,6 +8,7 @@ from Ship import Ship
 @dataclass(frozen=True)
 class ShipType:
     """Une ligne de règle du jeu : un type de bateau, sa longueur et son nombre d'exemplaires."""
+
     name: str
     length: int
     count: int = 1

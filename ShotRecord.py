@@ -8,6 +8,7 @@ from Player import ShotResult
 @dataclass(frozen=True)
 class ShotRecord:
     """Un coup joué, figé une fois enregistré : qui a tiré, où, et avec quel résultat."""
+
     shooter: str  # nom du tireur (une copie, pas une référence au joueur)
     position: str  # coordonnée lisible, ex. "B7"
     result: ShotResult  # résultat du tir

@@ -14,7 +14,7 @@ class ComputerPlayer(Player):
         self.grid.place_randomly(self.fleet)
 
     def choose_target(self, enemy_grid: Grid) -> tuple[int, int]:
-        """Tire au hasard parmi les cases jamais visées. Garde le commentaire « Seul cell.hit est consulté… » : il explique une garantie."""
+        """Tire au hasard parmi les cases jamais visées."""
         # Seul cell.hit est consulté : l'ordinateur ne regarde jamais où sont les bateaux
         candidates = [(cell.row, cell.col) for row in enemy_grid.cells for cell in row if not cell.hit]
         return random.choice(candidates)

@@ -2,12 +2,11 @@
 
 import random
 import re
-
 from collections.abc import Callable
 
 from Cell import Cell
-from Ship import Ship
 from Fleet import Fleet
+from Ship import Ship
 
 
 class Grid:
@@ -35,7 +34,7 @@ class Grid:
         if match is None:
             raise ValueError(f"« {text.strip()} » n'est pas une coordonnée (ex. B7)")
         row = int(match.group(2)) - 1
-        col = ord(match.group(1)) - ord('A')
+        col = ord(match.group(1)) - ord("A")
         if not self.contains(row, col):
             raise ValueError(f"{match.group(0)} est hors de la grille")
         return row, col
@@ -49,7 +48,7 @@ class Grid:
 
     def render(self, *, reveal: bool = False, style: Callable[[Cell, str], str] | None = None) -> list[str]:
         """Renvoie les lignes de la grille ; reveal=True pour la vue du propriétaire.
-           style, fourni par l'interface, peut habiller chaque symbole (couleurs...) sans que la grille le sache.
+        style, fourni par l'interface, peut habiller chaque symbole (couleurs...) sans que la grille le sache.
         """
         lines = ["   " + " ".join(chr(ord("A") + col) for col in range(self.size))]
         for number, row in enumerate(self.cells, start=1):
@@ -90,7 +89,7 @@ class Grid:
         """Place toute la flotte au hasard, des plus grands bateaux aux plus petits. Tout ou rien."""
         if any(ship.is_placed for ship in fleet):
             raise ValueError("La flotte est déjà (en partie) placée")
-        if sum(ship.length for ship in fleet) > self.size ** 2:
+        if sum(ship.length for ship in fleet) > self.size**2:
             raise ValueError("La flotte ne tient pas dans la grille")
         ships = sorted(fleet, key=lambda ship: ship.length, reverse=True)
         for _ in range(max_attempts):
@@ -108,10 +107,12 @@ class Grid:
 
     def _place_at_random_position(self, ship: Ship) -> bool:
         """Essaie toutes les positions dans un ordre aléatoire ; False si aucune ne convient."""
-        positions = [(row, col, horizontal)
-                     for row in range(self.size)
-                     for col in range(self.size)
-                     for horizontal in (True, False)]
+        positions = [
+            (row, col, horizontal)
+            for row in range(self.size)
+            for col in range(self.size)
+            for horizontal in (True, False)
+        ]
         random.shuffle(positions)
         for row, col, horizontal in positions:
             try:

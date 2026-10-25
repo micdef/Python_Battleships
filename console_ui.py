@@ -90,15 +90,16 @@ def print_side_by_side(left_title: str, left_lines: list[str], right_title: str,
     left = [left_title] + left_lines
     right = [right_title] + right_lines
     width = max(visible_len(line) for line in left)  # largeur de la colonne de gauche, titre compris
-    for left_line, right_line in zip(left, right):
+    for left_line, right_line in zip(left, right, strict=True):
         padding = " " * (width - visible_len(left_line))
         print(f"{left_line}{padding}      {right_line}")
 
 
 def show_grids(own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
     """Affiche côte à côte sa grille de bateaux (en couleurs) et sa grille de tirs (vue adverse), avec leurs titres."""
-    print_side_by_side("Bateaux :", own_grid.render(reveal=True, style=ship_colorizer(own_fleet)),
-                       "Tirs :", enemy_grid.render())
+    print_side_by_side(
+        "Bateaux :", own_grid.render(reveal=True, style=ship_colorizer(own_fleet)), "Tirs :", enemy_grid.render()
+    )
 
 
 def ask_name(read: Callable[[str], str] = input) -> str:
@@ -165,7 +166,9 @@ def announce_winner(winner: Player, loser: Player, history: tuple[ShotRecord, ..
 def ask_watch_mode(read: Callable[[str], str] = input) -> bool:
     """Demande le mode de jeu ; True pour regarder une partie entre deux ordinateurs."""
     while True:
-        answer = read("1. Jouer contre l'ordinateur\n2. Regarder une partie ordinateur contre ordinateur\nVotre choix : ")
+        answer = read(
+            "1. Jouer contre l'ordinateur\n2. Regarder une partie ordinateur contre ordinateur\nVotre choix : "
+        )
         if answer.strip() in ("1", "2"):
             return answer.strip() == "2"
         print("Refusé : répondez 1 ou 2\n")
@@ -174,8 +177,9 @@ def ask_watch_mode(read: Callable[[str], str] = input) -> bool:
 def ask_delay(read: Callable[[str], str] = input) -> float:
     """Demande la pause entre deux tirs, en secondes (0,5 par défaut, 0 à 5 acceptés)."""
     while True:
-        answer = read(
-            "Pause entre deux tirs, en secondes (Entrée = 0,5) (Min: 0,0 - Max 5,0) : ").strip().replace(",", ".")
+        answer = (
+            read("Pause entre deux tirs, en secondes (Entrée = 0,5) (Min: 0,0 - Max 5,0) : ").strip().replace(",", ".")
+        )
         if not answer:
             return 0.5
         try:

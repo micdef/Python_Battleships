@@ -46,10 +46,10 @@ class Cell:
         return Cell.UNKNOWN
 
     def __str__(self) -> str:
-        """Coordonnée lisible par le joueur, ex. « B7 » (colonne en lettre, ligne à partir de 1). Remplace le commentaire."""
+        """Coordonnée lisible par le joueur, ex. « B7 » (colonne en lettre, ligne à partir de 1)."""
         return f"{chr(ord('A') + self.col)}{self.row + 1}"
 
     def __repr__(self) -> str:
-        """Représentation pour le débogueur ; le bateau est nommé, pas développé (pas de récursion avec Ship). Remplace le commentaire."""
+        """Représentation pour le débogueur ; le bateau est nommé, pas développé (pas de récursion avec Ship)."""
         ship_name = self.ship.name if self.has_ship else None
         return f"Cell(row={self.row}, col={self.col}, ship={ship_name!r}, hit={self.hit})"
