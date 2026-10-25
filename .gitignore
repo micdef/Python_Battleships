@@ -10,3 +10,6 @@ __pycache__/
 
 # Cache local de pytest
 .pytest_cache/
+
+# Cache local de Ruff
+.ruff_cache/
