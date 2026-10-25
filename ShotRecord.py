@@ -1,3 +1,5 @@
+"""L’enregistrement immuable d’un coup joué, pour l’historique de la partie."""
+
 from dataclasses import dataclass
 
 from Player import ShotResult

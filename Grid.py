@@ -1,3 +1,5 @@
+"""La grille de jeu : ses cases, la lecture des coordonnées, l’affichage et le placement des bateaux."""
+
 import random
 import re
 
@@ -16,6 +18,7 @@ class Grid:
     DEFAULT_SIZE = 10  # Taille d'une bataille navale classique
 
     def __init__(self, size: int = DEFAULT_SIZE) -> None:
+        """Crée une grille carrée de cases vides ; la taille doit rester entre MIN_SIZE et MAX_SIZE."""
         if not Grid.MIN_SIZE <= size <= Grid.MAX_SIZE:
             raise ValueError(f"Taille {size} hors limites ({Grid.MIN_SIZE} à {Grid.MAX_SIZE})")
         self.size = size
@@ -119,4 +122,5 @@ class Grid:
         return False
 
     def __repr__(self) -> str:
+        """Représentation pour le débogueur : la taille de la grille."""
         return f"Grid(size={self.size})"

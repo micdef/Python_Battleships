@@ -1,3 +1,5 @@
+"""Règles de composition d’une flotte (types de bateaux) et flotte d’un joueur."""
+
 from dataclasses import dataclass
 
 from Ship import Ship
@@ -11,6 +13,7 @@ class ShipType:
     count: int = 1
 
     def __post_init__(self) -> None:
+        """Valide la règle dès sa création : longueur et nombre d’exemplaires au moins égaux à 1."""
         if self.length < 1 or self.count < 1:
             raise ValueError(f"{self.name} la longueur et le nombre doivent valoir au moins 1")
 
@@ -27,6 +30,7 @@ class Fleet:
     )
 
     def __init__(self, ship_types: tuple[ShipType, ...] = CLASSIC) -> None:
+        """Construit les bateaux décrits par la règle ; les exemplaires multiples sont numérotés (ex. « Mine-1 »)."""
         if not ship_types:
             raise ValueError("Une flotte doit contenir au moins un type de bateau.")
         names = [ship_type.name for ship_type in ship_types]
@@ -45,10 +49,13 @@ class Fleet:
         return all(ship.is_sunk for ship in self.ships)
 
     def __iter__(self):
+        """Permet de parcourir les bateaux : for ship in fleet."""
         return iter(self.ships)
 
     def __len__(self) -> int:
+        """Nombre de bateaux de la flotte : len(fleet)."""
         return len(self.ships)
 
     def __repr__(self) -> str:
+        """Représentation pour le débogueur : chaque bateau avec sa longueur."""
         return f"Fleet({', '.join(f'{ship.name}({ship.length})' for ship in self.ships)})"

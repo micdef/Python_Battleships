@@ -1,3 +1,5 @@
+"""Le déroulement d’une partie."""
+
 import random
 from collections.abc import Callable
 
@@ -10,6 +12,7 @@ class Game:
     """Une partie entre deux joueurs : placement des flottes, tirage au sort, tours alternés, victoire."""
 
     def __init__(self, first: Player, second: Player, *, on_shot: Callable[[ShotRecord], None] | None = None) -> None:
+        """Prépare la partie : grilles de même taille, tirage au sort du premier tireur et observateur facultatif."""
         if first.grid.size != second.grid.size:
             raise ValueError("Les deux joueurs doivent avoir des grilles de même taille")
         self.players = [first, second]

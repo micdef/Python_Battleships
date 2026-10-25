@@ -1,3 +1,5 @@
+"""Le joueur abstrait et le résultat d’un tir."""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -17,6 +19,7 @@ class Player(ABC):
 
     def __init__(self, name: str, grid_size: int = Grid.DEFAULT_SIZE,
                  ship_types: tuple[ShipType, ...] = Fleet.CLASSIC) -> None:
+        """	Crée un joueur avec sa propre grille et sa propre flotte, selon les réglages de la partie."""
         self.name = name
         self.grid = Grid(grid_size)
         self.fleet = Fleet(ship_types)
@@ -42,7 +45,9 @@ class Player(ABC):
         """Choisit une case jamais visée ; seule la vue adverse de la grille doit servir."""
 
     def __str__(self) -> str:
+        """Nom du joueur, utilisé dans les annonces."""
         return self.name
 
     def __repr__(self) -> str:
+        """Représentation pour le débogueur, avec le vrai type du joueur (humain ou ordinateur)."""
         return f"{type(self).__name__}(name={self.name!r}, fleet={self.fleet!r})"
