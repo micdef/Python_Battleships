@@ -3,9 +3,9 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from battleships.fleet import Fleet
-from battleships.grid import Grid
-from battleships.rules import CLASSIC_RULES, Rules
+from battleships.domain.fleet import Fleet
+from battleships.domain.grid import Grid
+from battleships.domain.rules import CLASSIC_RULES, Rules
 
 
 class ShotResult(Enum):

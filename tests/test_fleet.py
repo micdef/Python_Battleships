@@ -4,8 +4,8 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-from battleships.fleet import Fleet, ShipType
-from battleships.grid import Grid
+from battleships.domain.fleet import Fleet, ShipType
+from battleships.domain.grid import Grid
 
 
 def test_default_fleet_is_the_classic_one():

@@ -5,8 +5,8 @@ Règlement de référence : https://www.zpag.net/Jeux/battleship_reglement.html
 
 from dataclasses import dataclass
 
-from battleships.fleet import Fleet, ShipType
-from battleships.grid import Grid
+from battleships.domain.fleet import Fleet, ShipType
+from battleships.domain.grid import Grid
 
 
 @dataclass(frozen=True)

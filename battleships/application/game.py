@@ -3,9 +3,9 @@
 import random
 from collections.abc import Callable
 
-from battleships.game_view import GameView
-from battleships.player import Player
-from battleships.shot_record import ShotRecord
+from battleships.application.game_view import GameView
+from battleships.domain.player import Player
+from battleships.domain.shot_record import ShotRecord
 
 
 class Game:

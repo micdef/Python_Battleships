@@ -5,12 +5,12 @@ import time
 from collections.abc import Callable
 from itertools import zip_longest
 
-from battleships.cell import Cell
-from battleships.fleet import Fleet
-from battleships.game_view import GameView
-from battleships.grid import Grid
-from battleships.player import Player
-from battleships.shot_record import ShotRecord
+from battleships.application.game_view import GameView
+from battleships.domain.cell import Cell
+from battleships.domain.fleet import Fleet
+from battleships.domain.grid import Grid
+from battleships.domain.player import Player
+from battleships.domain.shot_record import ShotRecord
 
 # Codes couleur ANSI : une couleur par bateau sur sa propre grille (le rouge reste libre pour plus tard)
 RESET = "\033[0m"

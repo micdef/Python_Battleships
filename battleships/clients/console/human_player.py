@@ -1,9 +1,9 @@
 """Le joueur humain, qui joue au clavier dans la console."""
 
-from battleships.console_ui import ConsoleUI
-from battleships.grid import Grid
-from battleships.player import Player
-from battleships.rules import CLASSIC_RULES, Rules
+from battleships.clients.console.ui import ConsoleUI
+from battleships.domain.grid import Grid
+from battleships.domain.player import Player
+from battleships.domain.rules import CLASSIC_RULES, Rules
 
 
 class HumanPlayer(Player):

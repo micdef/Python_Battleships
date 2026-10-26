@@ -4,9 +4,9 @@ import random
 import re
 from collections.abc import Callable
 
-from battleships.cell import Cell
-from battleships.fleet import Fleet
-from battleships.ship import Ship
+from battleships.domain.cell import Cell
+from battleships.domain.fleet import Fleet
+from battleships.domain.ship import Ship
 
 
 class Grid:
