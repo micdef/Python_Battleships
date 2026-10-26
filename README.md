@@ -57,8 +57,8 @@ l'ancienne console Windows (conhost) ne le fait pas encore, voir la feuille de r
 - **Interface injectée** : la partie ne connaît qu'un contrat, `GameView`. La console (`ConsoleUI`)
   déclare le respecter et est donnée à la partie par `main.py` ; une autre interface pourra la remplacer
   sans modifier la partie.
-- **Polymorphisme** : une classe abstraite `Player`, deux implémentations (`HumanPlayer`,
-  `ComputerPlayer`) ; la partie ne sait pas qui est humain.
+- **Stratégies de tir** : l'ordinateur est un joueur doté d'une stratégie interchangeable (`TargetingStrategy`) ;
+  chaque niveau de difficulté sera une stratégie, sans rien changer au reste du jeu.
 - **Contrats vérifiés à chaque couche** et opérations « tout ou rien » : un placement refusé
   ne modifie pas la grille.
 - **Une seule source de vérité** : « coulé » et « flotte détruite » sont calculés, jamais stockés.
