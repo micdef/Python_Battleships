@@ -29,6 +29,6 @@ class Ship:
         return self.name
 
     def __repr__(self) -> str:
-        """Représentation pour le débogueur ; les cases sont données par leur coordonnée (pas de récursion avec Cell"""
+        """Représentation pour le débogueur ; les cases sont données par leur coordonnée (pas de récursion avec Cell)"""
         positions = ", ".join(str(cell) for cell in self.cells)
         return f"Ship(name={self.name!r}, length={self.length}, cells=[{positions}], sunk={self.is_sunk})"
