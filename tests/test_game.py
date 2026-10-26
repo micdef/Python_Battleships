@@ -6,16 +6,19 @@ from itertools import pairwise
 import pytest
 
 from battleships.computer_player import ComputerPlayer
+from battleships.fleet import ShipType
 from battleships.game import Game
 from battleships.human_player import HumanPlayer
 from battleships.player import Player, ShotResult
+from battleships.rules import Rules
 from battleships.shot_record import ShotRecord
 
 
-def test_players_must_have_grids_of_the_same_size(console):
-    """Les deux joueurs s’affrontent sur des grilles de même taille."""
-    with pytest.raises(ValueError, match="même taille"):
-        Game(ComputerPlayer("A"), ComputerPlayer("B", grid_size=12), view=console())
+@pytest.mark.parametrize("other_rules", [Rules(grid_size=12), Rules(ship_types=(ShipType("Mine", 1),))])
+def test_players_must_play_with_the_same_rules(console, other_rules):
+    """Les deux joueurs s'affrontent avec les mêmes règles : même taille de grille et même flotte."""
+    with pytest.raises(ValueError, match="mêmes règles"):
+        Game(ComputerPlayer("A"), ComputerPlayer("B", other_rules), view=console())
 
 
 def test_draw_for_first_shooter_is_fair(console):

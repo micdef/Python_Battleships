@@ -14,12 +14,12 @@ class Game:
     def __init__(
         self, first: Player, second: Player, *, view: GameView, on_shot: Callable[[ShotRecord], None] | None = None
     ) -> None:
-        """Prépare la partie : grilles de même taille, tirage au sort du premier tireur et interface à prévenir.
+        """Prépare la partie : mêmes règles des deux côtés, tirage au sort du premier tireur, interface à prévenir.
 
         view reçoit les annonces de la partie ; on_shot est un observateur facultatif (ex. vue spectateur).
         """
-        if first.grid.size != second.grid.size:
-            raise ValueError("Les deux joueurs doivent avoir des grilles de même taille")
+        if first.rules != second.rules:
+            raise ValueError("Les deux joueurs doivent jouer avec les mêmes règles")
         self.players = [first, second]
         random.shuffle(self.players)  # tirage au sort : celui qui commence a un avantage
         self._view = view

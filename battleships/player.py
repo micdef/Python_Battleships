@@ -3,8 +3,9 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from battleships.fleet import Fleet, ShipType
+from battleships.fleet import Fleet
 from battleships.grid import Grid
+from battleships.rules import CLASSIC_RULES, Rules
 
 
 class ShotResult(Enum):
@@ -18,13 +19,12 @@ class ShotResult(Enum):
 class Player(ABC):
     """Un joueur : possède sa grille et sa flotte ; sa façon de jouer est définie par les sous-classes."""
 
-    def __init__(
-        self, name: str, grid_size: int = Grid.DEFAULT_SIZE, ship_types: tuple[ShipType, ...] = Fleet.CLASSIC
-    ) -> None:
-        """Crée un joueur avec sa propre grille et sa propre flotte, selon les réglages de la partie."""
+    def __init__(self, name: str, rules: Rules = CLASSIC_RULES) -> None:
+        """Crée un joueur avec sa propre grille et sa propre flotte, selon les régles de la partie."""
         self.name = name
-        self.grid = Grid(grid_size)
-        self.fleet = Fleet(ship_types)
+        self.rules = rules
+        self.grid = Grid(rules.grid_size)
+        self.fleet = Fleet(rules.ship_types)
 
     @property
     def is_defeated(self) -> bool:

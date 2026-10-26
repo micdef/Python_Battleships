@@ -1,26 +1,20 @@
 """Le joueur humain, qui joue au clavier dans la console."""
 
 from battleships.console_ui import ConsoleUI
-from battleships.fleet import Fleet, ShipType
 from battleships.grid import Grid
 from battleships.player import Player
+from battleships.rules import CLASSIC_RULES, Rules
 
 
 class HumanPlayer(Player):
     """Le joueur humain, en console : il choisit son placement et ses tirs au clavier."""
 
-    def __init__(
-        self,
-        name: str,
-        ui: ConsoleUI,
-        grid_size: int = Grid.DEFAULT_SIZE,
-        ship_types: tuple[ShipType, ...] = Fleet.CLASSIC,
-    ) -> None:
+    def __init__(self, name: str, ui: ConsoleUI, rules: Rules = CLASSIC_RULES) -> None:
         """Crée le joueur humain.
 
         ui est la console par laquelle il voit le jeu et répond aux questions.
         """
-        super().__init__(name, grid_size, ship_types)
+        super().__init__(name, rules)
         self._ui = ui
 
     def place_fleet(self) -> None:

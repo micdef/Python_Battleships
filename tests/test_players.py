@@ -6,6 +6,7 @@ from battleships.computer_player import ComputerPlayer
 from battleships.fleet import ShipType
 from battleships.human_player import HumanPlayer
 from battleships.player import Player, ShotResult
+from battleships.rules import Rules
 
 
 def test_abstract_player_cannot_be_created():
@@ -30,15 +31,15 @@ def test_subclass_missing_a_method_cannot_be_created():
 
 
 def test_settings_are_passed_to_grid_and_fleet():
-    """La taille de grille et la flotte choisies sont bien transmises au joueur."""
-    player = ComputerPlayer("Ordinateur", grid_size=12, ship_types=(ShipType("Mine", 1, count=4),))
+    """Le joueur construit sa grille et sa flotte selon les règles reçues."""
+    player = ComputerPlayer("Ordinateur", Rules(grid_size=12, ship_types=(ShipType("Mine", 1, count=4),)))
     assert player.grid.size == 12
     assert len(player.fleet) == 4
 
 
 def test_receive_shot_announces_miss_hit_then_sunk():
     """Un tir est annoncé « à l’eau », « touché » ou « coulé », et le dernier bateau coulé fait perdre."""
-    player = ComputerPlayer("Cible", ship_types=(ShipType("Torpilleur", 2),))
+    player = ComputerPlayer("Cible", Rules(ship_types=(ShipType("Torpilleur", 2),)))
     player.grid.place(player.fleet.ships[0], 0, 0, horizontal=True)
     assert player.receive_shot(5, 5) is ShotResult.MISS
     assert player.receive_shot(0, 0) is ShotResult.HIT
@@ -73,7 +74,7 @@ def test_human_can_choose_automatic_placement_after_a_typo(console, capsys):
 
 def test_human_can_place_manually(console):
     """Le joueur peut placer ses bateaux lui-même au clavier."""
-    human = HumanPlayer("Michael", console("M", "A1 V"), ship_types=(ShipType("Torpilleur", 2),))
+    human = HumanPlayer("Michael", console("M", "A1 V"), Rules(ship_types=(ShipType("Torpilleur", 2),)))
     human.place_fleet()
     assert [str(cell) for cell in human.fleet.ships[0].cells] == ["A1", "A2"]
 
