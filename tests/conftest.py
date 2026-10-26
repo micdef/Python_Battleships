@@ -10,6 +10,9 @@ from collections.abc import Callable
 import pytest
 
 from battleships.clients.console.ui import ConsoleUI
+from battleships.domain.player import Player
+from battleships.domain.rules import CLASSIC_RULES, Rules
+from battleships.domain.strategy import RandomStrategy
 
 
 @pytest.fixture(autouse=True)
@@ -34,5 +37,16 @@ def console() -> Callable[..., ConsoleUI]:
         """Crée une console qui répond answers[0], puis answers[1]... sans tenir compte de la question."""
         replies = iter(answers)  # itérateur : next() lit une réponse à la fois, comme IEnumerator.MoveNext()
         return ConsoleUI(read=lambda prompt: next(replies))
+
+    return make
+
+
+@pytest.fixture
+def computer() -> Callable[..., Player]:
+    """Fabrique un joueur ordinateur (stratégie au hasard), avec les règles d'origine sauf précision contraire."""
+
+    def make(name: str, rules: Rules = CLASSIC_RULES) -> Player:
+        """Crée un ordinateur nommé name, qui tire au hasard."""
+        return Player(name, rules, strategy=RandomStrategy())
 
     return make
