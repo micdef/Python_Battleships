@@ -1,8 +1,6 @@
 """Le joueur humain, qui joue au clavier dans la console."""
 
-from collections.abc import Callable
-
-from battleships.console_ui import ask_automatic_placement, ask_target, place_manually, refresh_screen
+from battleships.console_ui import ConsoleUI
 from battleships.fleet import Fleet, ShipType
 from battleships.grid import Grid
 from battleships.player import Player
@@ -14,24 +12,25 @@ class HumanPlayer(Player):
     def __init__(
         self,
         name: str,
+        ui: ConsoleUI,
         grid_size: int = Grid.DEFAULT_SIZE,
         ship_types: tuple[ShipType, ...] = Fleet.CLASSIC,
-        read: Callable[[str], str] = input,
     ) -> None:
         """Crée le joueur humain.
-        read est la source des saisies (le clavier par défaut, une fausse saisie dans les tests).
+
+        ui est la console par laquelle il voit le jeu et répond aux questions.
         """
         super().__init__(name, grid_size, ship_types)
-        self.read = read  # source des saisies : le clavier, ou une fonction de test
+        self._ui = ui
 
     def place_fleet(self) -> None:
         """Demande au joueur un placement automatique ou manuel, puis l’exécute."""
-        if ask_automatic_placement(self.read):
+        if self._ui.ask_automatic_placement():
             self.grid.place_randomly(self.fleet)
         else:
-            place_manually(self.grid, self.fleet, self.read)
+            self._ui.place_manually(self.grid, self.fleet)
 
     def choose_target(self, enemy_grid: Grid) -> tuple[int, int]:
         """Réaffiche les grilles et les derniers tirs, puis demande au joueur la case à viser."""
-        refresh_screen(self.grid, self.fleet, enemy_grid)  # l'humain voit ses deux grilles avant de viser
-        return ask_target(enemy_grid, self.read)
+        self._ui.refresh_screen(self.grid, self.fleet, enemy_grid)
+        return self._ui.ask_target(enemy_grid)

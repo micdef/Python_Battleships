@@ -7,6 +7,7 @@ from itertools import zip_longest
 
 from battleships.cell import Cell
 from battleships.fleet import Fleet
+from battleships.game_view import GameView
 from battleships.grid import Grid
 from battleships.player import Player
 from battleships.shot_record import ShotRecord
@@ -16,9 +17,6 @@ RESET = "\033[0m"
 SHIP_COLORS = ("\033[94m", "\033[92m", "\033[93m", "\033[95m", "\033[96m", "\033[33m")
 ANSI_CODE = re.compile(r"\x1b\[[0-9;]*m")
 CLEAR_SCREEN = "\033[H\033[2J\033[3J"  # curseur en haut à gauche, efface l'écran puis l'historique de défilement
-
-# Annonces en attente : affichées sous les grilles au prochain rafraîchissement de l'écran
-_pending_messages: list[str] = []
 
 
 def ship_colorizer(fleet: Fleet) -> Callable[[Cell, str], str]:
@@ -49,42 +47,6 @@ def parse_placement(text: str, grid: Grid) -> tuple[int, int, bool]:
     return row, col, direction == "H"
 
 
-def place_manually(grid: Grid, fleet: Fleet, read: Callable[[str], str] = input) -> None:
-    """Fait placer chaque bateau par le joueur ; redemande tant que la saisie est refusée."""
-    for ship in fleet:
-        while True:
-            print("\n".join(grid.render(reveal=True, style=ship_colorizer(fleet))))
-            answer = read(f"{ship} ({ship.length} cases), position et sens (ex. B7 H) : ")
-            try:
-                row, col, horizontal = parse_placement(answer, grid)
-                grid.place(ship, row, col, horizontal=horizontal)
-                break
-            except ValueError as error:
-                print(f"Refusé : {error}\n")
-
-
-def ask_automatic_placement(read: Callable[[str], str] = input) -> bool:
-    """Demande le mode de placement ; True pour automatique."""
-    while True:
-        answer = read("Placement automatique (A) ou manuel (M) ? ").strip().upper()
-        if answer in ("A", "M"):
-            return answer == "A"
-        print("Refusé : répondez A ou M\n")
-
-
-def ask_target(enemy_grid: Grid, read: Callable[[str], str] = input) -> tuple[int, int]:
-    """Demande une case à viser ; refuse les cases hors grille ou déjà visées."""
-    while True:
-        answer = read("Votre tir (ex. B7) : ")
-        try:
-            row, col = enemy_grid.parse_position(answer)
-            if enemy_grid[row, col].hit:
-                raise ValueError(f"{enemy_grid[row, col]} a déjà été visée")
-            return row, col
-        except ValueError as error:
-            print(f"Refusé : {error}\n")
-
-
 def print_side_by_side(left_title: str, left_lines: list[str], right_title: str, right_lines: list[str]) -> None:
     """Affiche deux blocs de lignes côte à côte, chacun sous son titre, en ignorant les codes couleur."""
     left = [left_title] + left_lines
@@ -102,41 +64,10 @@ def show_grids(own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
     )
 
 
-def ask_name(read: Callable[[str], str] = input) -> str:
-    """Demande le nom du joueur ; « Joueur » si la saisie est vide."""
-    return read("Votre nom : ").strip() or "Joueur"
-
-
-def _flush_messages() -> None:
-    """Affiche les annonces en attente, puis les oublie."""
-    for message in _pending_messages:
-        print(message)
-    _pending_messages.clear()
-
-
-def refresh_screen(own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
-    """Efface l'écran et réaffiche les deux grilles, avec dessous les annonces depuis le dernier affichage."""
-    print(CLEAR_SCREEN, end="")
-    show_grids(own_grid, own_fleet, enemy_grid)
-    print()
-    _flush_messages()
-    print()
-
-
-def announce_start(first: Player) -> None:
-    """Met en attente l’annonce du tirage au sort, affichée au prochain rafraîchissement."""
-    _pending_messages.append(f"Tirage au sort : {first} commence.")
-
-
 def format_shot(record: ShotRecord) -> str:
     """Texte d'un coup joué, identique dans les annonces et dans l'historique."""
     detail = f" ({record.sunk_ship})" if record.sunk_ship else ""
     return f"{record.shooter} tire en {record.position} : {record.result.value}{detail}"
-
-
-def announce_shot(record: ShotRecord) -> None:
-    """Met en attente l’annonce d’un tir, affichée au prochain rafraîchissement."""
-    _pending_messages.append(format_shot(record))
 
 
 def show_history(history: tuple[ShotRecord, ...]) -> None:
@@ -149,58 +80,135 @@ def show_history(history: tuple[ShotRecord, ...]) -> None:
         print(f"{number:>3}. {format_shot(first):<{width}}   {right}")
 
 
-def _revealed_grid(player: Player) -> list[str]:
+def revealed_grid(player: Player) -> list[str]:
     """Grille complète d'un joueur, bateaux visibles et en couleurs (fin de partie, spectateur)."""
     return player.grid.render(reveal=True, style=ship_colorizer(player.fleet))
 
 
-def announce_winner(winner: Player, loser: Player, history: tuple[ShotRecord, ...]) -> None:
-    """Écran final : derniers tirs, vainqueur, les deux grilles dévoilées et l'historique de la partie."""
-    print(CLEAR_SCREEN, end="")
-    _flush_messages()
-    print(f"\n{winner} a gagné !")
-    print_side_by_side(f"{winner} :", _revealed_grid(winner), f"{loser} :", _revealed_grid(loser))
-    show_history(history)
+class ConsoleUI(GameView):
+    """La console d'une partie : pose les questions au joueur et affiche le jeu.
+    Déclare respecter le contrat GameView.
+    Chaque instance a ses propres annonces en attente : deux consoles ne partagent rien.
+    """
 
+    def __init__(self, read: Callable[[str], str] = input) -> None:
+        """Crée une console.
+        read est la source des saisies : le clavier par défaut, une fausse saisie dans les tests.
+        """
+        self._read = read
+        self._pending_messages: list[str] = []  # annonces affichées sous les grilles au prochain rafraîchissement
 
-def ask_watch_mode(read: Callable[[str], str] = input) -> bool:
-    """Demande le mode de jeu ; True pour regarder une partie entre deux ordinateurs."""
-    while True:
-        answer = read(
-            "1. Jouer contre l'ordinateur\n2. Regarder une partie ordinateur contre ordinateur\nVotre choix : "
-        )
-        if answer.strip() in ("1", "2"):
-            return answer.strip() == "2"
-        print("Refusé : répondez 1 ou 2\n")
+    # --- Questions au joueur ---
 
+    def ask_name(self) -> str:
+        """Demande le nom du joueur ; « Joueur » si la saisie est vide."""
+        return self._read("Votre nom : ").strip() or "Joueur"
 
-def ask_delay(read: Callable[[str], str] = input) -> float:
-    """Demande la pause entre deux tirs, en secondes (0,5 par défaut, 0 à 5 acceptés)."""
-    while True:
-        answer = (
-            read("Pause entre deux tirs, en secondes (Entrée = 0,5) (Min: 0,0 - Max 5,0) : ").strip().replace(",", ".")
-        )
-        if not answer:
-            return 0.5
-        try:
-            delay = float(answer)
-        except ValueError:
-            print("Refusé : donnez un nombre (ex. 0,5)\n")
-            continue
-        if 0 <= delay <= 5:
-            return delay
-        print("Refusé : la pause doit être comprise entre 0,0 et 5,0 secondes\n")
+    def ask_watch_mode(self) -> bool:
+        """Demande le mode de jeu ; True pour regarder une partie entre deux ordinateurs."""
+        while True:
+            answer = self._read(
+                "1. Jouer contre l'ordinateur\n2. Regarder une partie ordinateur contre ordinateur\nVotre choix : "
+            )
+            if answer.strip() in ("1", "2"):
+                return answer.strip() == "2"
+            print("Refusé : répondez 1 ou 2\n")
 
+    def ask_delay(self) -> float:
+        """Demande la pause entre deux tirs, en secondes (0,5 par défaut, 0 à 5 acceptés)."""
+        while True:
+            answer = (
+                self._read("Pause entre deux tirs, en secondes (Entrée = 0,5) (Min: 0,0 - Max 5,0) : ")
+                .strip()
+                .replace(",", ".")
+            )
+            if not answer:
+                return 0.5
+            try:
+                delay = float(answer)
+            except ValueError:
+                print("Refusé : donnez un nombre (ex. 0,5)\n")
+                continue
+            if 0 <= delay <= 5:
+                return delay
+            print("Refusé : la pause doit être comprise entre 0,0 et 5,0 secondes\n")
 
-def spectator_view(left: Player, right: Player, delay: float) -> Callable[[ShotRecord], None]:
-    """Renvoie l'observateur qui, après chaque tir, réaffiche les deux grilles dévoilées puis marque une pause."""
+    def ask_automatic_placement(self) -> bool:
+        """Demande le mode de placement ; True pour automatique."""
+        while True:
+            answer = self._read("Placement automatique (A) ou manuel (M) ? ").strip().upper()
+            if answer in ("A", "M"):
+                return answer == "A"
+            print("Refusé : répondez A ou M\n")
 
-    def show(record: ShotRecord) -> None:
-        """Après chaque tir : réaffiche les deux flottes dévoilées et le dernier tir, puis marque la pause."""
+    def place_manually(self, grid: Grid, fleet: Fleet) -> None:
+        """Fait placer chaque bateau par le joueur ; redemande tant que la saisie est refusée."""
+        for ship in fleet:
+            while True:
+                print("\n".join(grid.render(reveal=True, style=ship_colorizer(fleet))))
+                answer = self._read(f"{ship} ({ship.length} cases), position et sens (ex. B7 H) : ")
+                try:
+                    row, col, horizontal = parse_placement(answer, grid)
+                    grid.place(ship, row, col, horizontal=horizontal)
+                    break
+                except ValueError as error:
+                    print(f"Refusé : {error}\n")
+
+    def ask_target(self, enemy_grid: Grid) -> tuple[int, int]:
+        """Demande une case à viser ; refuse les cases hors grille ou déjà visées."""
+        while True:
+            answer = self._read("Votre tir (ex. B7) : ")
+            try:
+                row, col = enemy_grid.parse_position(answer)
+                if enemy_grid[row, col].hit:
+                    raise ValueError(f"{enemy_grid[row, col]} a déjà été visée")
+                return row, col
+            except ValueError as error:
+                print(f"Refusé : {error}\n")
+
+    # --- Affichage du jeu ---
+
+    def refresh_screen(self, own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
+        """Efface l'écran et réaffiche les deux grilles, avec dessous les annonces depuis le dernier affichage."""
         print(CLEAR_SCREEN, end="")
-        print_side_by_side(f"{left} :", _revealed_grid(left), f"{right} :", _revealed_grid(right))
+        show_grids(own_grid, own_fleet, enemy_grid)
         print()
-        _flush_messages()
-        time.sleep(delay)
+        self._flush_messages()
+        print()
 
-    return show
+    def _flush_messages(self) -> None:
+        """Affiche les annonces en attente, puis les oublie."""
+        for message in self._pending_messages:
+            print(message)
+        self._pending_messages.clear()
+
+    def spectator_view(self, left: Player, right: Player, delay: float) -> Callable[[ShotRecord], None]:
+        """Renvoie l'observateur qui, après chaque tir, réaffiche les deux grilles dévoilées puis marque une pause."""
+
+        def show(record: ShotRecord) -> None:
+            """Après chaque tir : réaffiche les deux flottes dévoilées et le dernier tir, puis marque la pause."""
+            print(CLEAR_SCREEN, end="")
+            print_side_by_side(f"{left} :", revealed_grid(left), f"{right} :", revealed_grid(right))
+            print()
+            self._flush_messages()
+            time.sleep(delay)
+
+        return show
+
+    # --- Contrat GameView : les annonces de la partie ---
+
+    def announce_start(self, first: Player) -> None:
+        """Met en attente l’annonce du tirage au sort, affichée au prochain rafraîchissement."""
+        self._pending_messages.append(f"Tirage au sort : {first} commence.")
+
+    def announce_shot(self, record: ShotRecord) -> None:
+        """Met en attente l’annonce d’un tir, affichée au prochain rafraîchissement."""
+        self._pending_messages.append(format_shot(record))
+
+    def announce_winner(self, winner: Player, loser: Player, history: tuple[ShotRecord, ...]) -> None:
+        """Écran final : derniers tirs, vainqueur, les deux grilles dévoilées et l'historique de la partie."""
+        print(CLEAR_SCREEN, end="")
+        self._flush_messages()
+        print(f"\n{winner} a gagné !")
+        print_side_by_side(f"{winner} :", revealed_grid(winner), f"{loser} :", revealed_grid(loser))
+        show_history(history)

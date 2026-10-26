@@ -4,14 +4,10 @@ import pytest
 
 from battleships.console_ui import (
     ANSI_CODE,
-    announce_shot,
-    ask_delay,
-    ask_name,
-    ask_watch_mode,
+    ConsoleUI,
     format_shot,
     parse_placement,
     print_side_by_side,
-    refresh_screen,
     ship_colorizer,
     show_history,
     visible_len,
@@ -38,27 +34,27 @@ def test_parse_placement_refuses_invalid_text(text, message):
 
 
 @pytest.mark.parametrize(("answer", "expected"), [("", 0.5), ("1.5", 1.5), ("0,5", 0.5), (" 0,2 ", 0.2)])
-def test_ask_delay_accepts_point_comma_and_default(keyboard, answer, expected):
+def test_ask_delay_accepts_point_comma_and_default(console, answer, expected):
     """Régression : la conversion de la virgule s'appliquait à la question au lieu de la réponse."""
-    assert ask_delay(keyboard(answer)) == expected
+    assert console(answer).ask_delay() == expected
 
 
-def test_ask_delay_asks_again_until_the_value_is_valid(keyboard, capsys):
+def test_ask_delay_asks_again_until_the_value_is_valid(console, capsys):
     """Une pause non numérique ou hors limites est redemandée."""
-    assert ask_delay(keyboard("abc", "9", "-1", "5")) == 5
+    assert console("abc", "9", "-1", "5").ask_delay() == 5
     assert capsys.readouterr().out.count("Refusé") == 3
 
 
-def test_ask_watch_mode_asks_again_until_1_or_2(keyboard):
+def test_ask_watch_mode_asks_again_until_1_or_2(console):
     """Le menu redemande tant que le choix n’est pas 1 ou 2."""
-    assert ask_watch_mode(keyboard("3", "2")) is True
-    assert ask_watch_mode(keyboard("1")) is False
+    assert console("3", "2").ask_watch_mode() is True
+    assert console("1").ask_watch_mode() is False
 
 
-def test_empty_name_becomes_joueur(keyboard):
+def test_empty_name_becomes_joueur(console):
     """Un nom vide devient « Joueur », et les espaces autour du nom sont retirés."""
-    assert ask_name(keyboard("   ")) == "Joueur"
-    assert ask_name(keyboard(" Michaël ")) == "Michaël"
+    assert console("   ").ask_name() == "Joueur"
+    assert console(" Michaël ").ask_name() == "Michaël"
 
 
 def test_visible_len_ignores_color_codes():
@@ -93,9 +89,18 @@ def test_history_keeps_the_winning_shot_when_the_count_is_odd(capsys):
     assert "A tire en C1 : Coulé (Torpilleur)" in capsys.readouterr().out
 
 
-def test_pending_messages_are_shown_once_under_the_grids(capsys):
+def test_pending_messages_are_shown_once_under_the_grids(console, capsys):
     """Chaque annonce est affichée une seule fois, au rafraîchissement suivant."""
-    announce_shot(ShotRecord("Ordinateur", "C2", ShotResult.HIT))
-    refresh_screen(Grid(), Fleet(), Grid())
-    refresh_screen(Grid(), Fleet(), Grid())
+    ui = console()
+    ui.announce_shot(ShotRecord("Ordinateur", "C2", ShotResult.HIT))
+    ui.refresh_screen(Grid(), Fleet(), Grid())
+    ui.refresh_screen(Grid(), Fleet(), Grid())
     assert capsys.readouterr().out.count("Ordinateur tire en C2 : Touché") == 1
+
+
+def test_each_console_has_its_own_pending_messages(capsys):
+    """Régression : les annonces en attente étaient un état global partagé par tout le programme."""
+    first, second = ConsoleUI(), ConsoleUI()
+    first.announce_shot(ShotRecord("Ordinateur", "C2", ShotResult.HIT))
+    second.refresh_screen(Grid(), Fleet(), Grid())
+    assert "Ordinateur tire en C2" not in capsys.readouterr().out
