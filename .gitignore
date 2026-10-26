@@ -5,8 +5,15 @@
 __pycache__/
 *.py[cod]
 
-# Configuration locale de l'éditeur (PyCharm)
+# Configuration locale des éditeurs : propre à chaque poste, le dépôt reste neutre
+# PyCharm
 .idea/
+# Visual Studio (projet, solution et réglages ; le fichier de projet standard reste pyproject.toml)
+.vs/
+*.pyproj
+*.pyproj.user
+*.sln
+*.slnx
 
 # Cache local de pytest
 .pytest_cache/
