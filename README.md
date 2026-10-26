@@ -18,6 +18,7 @@ la bataille navale m'a semblé une bonne mise en bouche.
 - 1.0 - Historique complet de la partie affiché à la fin
 - 1.0 - Flottes configurables dans le code (flotte classique par défaut)
 - 1.1 - Mode spectateur : regarder une partie entre deux ordinateurs
+- 2.0 - Bateau nommé dès qu'il est touché, comme le veut le règlement
 
 ## Lancer le jeu
 

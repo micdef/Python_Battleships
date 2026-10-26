@@ -66,7 +66,7 @@ def show_grids(own_grid: Grid, own_fleet: Fleet, enemy_grid: Grid) -> None:
 
 def format_shot(record: ShotRecord) -> str:
     """Texte d'un coup joué, identique dans les annonces et dans l'historique."""
-    detail = f" ({record.sunk_ship})" if record.sunk_ship else ""
+    detail = f" ({record.ship_name})" if record.ship_name else ""
     return f"{record.shooter} tire en {record.position} : {record.result.value}{detail}"
 
 
