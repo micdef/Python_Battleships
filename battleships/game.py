@@ -4,7 +4,7 @@ import random
 from collections.abc import Callable
 
 from battleships.game_view import GameView
-from battleships.player import Player, ShotResult
+from battleships.player import Player
 from battleships.shot_record import ShotRecord
 
 
@@ -41,8 +41,8 @@ class Game:
             row, col = shooter.choose_target(target.grid)
             result = target.receive_shot(row, col)
             cell = target.grid[row, col]
-            sunk_ship = cell.ship.name if result is ShotResult.SUNK else None
-            record = ShotRecord(str(shooter), str(cell), result, sunk_ship)
+            ship_name = cell.ship.name if cell.has_ship else None  # le règlement fait nommer le bateau touché
+            record = ShotRecord(str(shooter), str(cell), result, ship_name)
             self._history.append(record)
             self._view.announce_shot(record)
             if self._on_shot:

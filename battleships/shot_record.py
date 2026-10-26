@@ -12,4 +12,4 @@ class ShotRecord:
     shooter: str  # nom du tireur (une copie, pas une référence au joueur)
     position: str  # coordonnée lisible, ex. "B7"
     result: ShotResult  # résultat du tir
-    sunk_ship: str | None = None  # nom du bateau, seulement s'il vient d'être coulé
+    ship_name: str | None = None  # bateau touché ou coulé (le règlement le fait nommer) ; None si à l'eau

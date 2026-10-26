@@ -49,6 +49,17 @@ def test_history_alternates_shooters_and_ends_with_the_winning_shot(console, cap
     assert game.history[-1].result is ShotResult.SUNK
 
 
+def test_every_hit_names_the_ship_and_every_miss_does_not(console, capsys):
+    """Règlement : le défenseur révèle le bateau dès qu'il est touché ; un tir à l'eau ne nomme rien."""
+    game = Game(ComputerPlayer("A"), ComputerPlayer("B"), view=console())
+    game.play()
+    for record in game.history:
+        if record.result is ShotResult.MISS:
+            assert record.ship_name is None
+        else:
+            assert record.ship_name
+
+
 def test_history_cannot_be_modified(console, capsys):
     """L’historique est un journal en lecture seule : aucun coup ne peut être ajouté ni modifié."""
     game = Game(ComputerPlayer("A"), ComputerPlayer("B"), view=console())

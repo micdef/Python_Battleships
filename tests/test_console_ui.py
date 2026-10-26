@@ -72,10 +72,17 @@ def test_side_by_side_stays_aligned_with_colors(capsys):
     assert all(line[right_column - 6 : right_column] == " " * 6 for line in lines)
 
 
-def test_format_shot_names_the_sunk_ship():
-    """Régression : la parenthèse fermante manquait après le nom du bateau."""
-    record = ShotRecord("Michaël", "B7", ShotResult.SUNK, "Croiseur")
-    assert format_shot(record) == "Michaël tire en B7 : Coulé (Croiseur)"
+@pytest.mark.parametrize(
+    ("result", "ship_name", "expected"),
+    [
+        (ShotResult.MISS, None, "Michaël tire en B7 : À l'eau"),
+        (ShotResult.HIT, "Croiseur", "Michaël tire en B7 : Touché (Croiseur)"),
+        (ShotResult.SUNK, "Croiseur", "Michaël tire en B7 : Coulé (Croiseur)"),
+    ],
+)
+def test_format_shot_names_the_ship_hit_or_sunk(result, ship_name, expected):
+    """Le bateau est nommé dès qu'il est touché, comme le veut le règlement (régression : parenthèse fermante)."""
+    assert format_shot(ShotRecord("Michaël", "B7", result, ship_name)) == expected
 
 
 def test_history_keeps_the_winning_shot_when_the_count_is_odd(capsys):
