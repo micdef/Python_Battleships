@@ -14,6 +14,8 @@ __pycache__/
 *.pyproj.user
 *.sln
 *.slnx
+# Résultats de l'explorateur de tests de Visual Studio
+TestResults/
 
 # Cache local de pytest
 .pytest_cache/
