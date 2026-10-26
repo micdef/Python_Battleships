@@ -1,9 +1,9 @@
 """Point d’entrée du jeu (python main.py) : choix du mode, puis lancement de la partie."""
 
-from battleships.computer_player import ComputerPlayer
-from battleships.console_ui import ConsoleUI
-from battleships.game import Game
-from battleships.human_player import HumanPlayer
+from battleships.application.game import Game
+from battleships.clients.console.human_player import HumanPlayer
+from battleships.clients.console.ui import ConsoleUI
+from battleships.domain.computer_player import ComputerPlayer
 
 if __name__ == "__main__":
     # Point d'assemblage : c'est ici, et seulement ici, que l'on choisit l'interface et qu'on la donne aux objets

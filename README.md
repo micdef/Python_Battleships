@@ -49,7 +49,9 @@ l'ancienne console Windows (conhost) ne le fait pas encore, voir la feuille de r
 
 ## Conception
 
-- **Le jeu est un package** (`battleships/`) ; seul le point d'entrée `main.py` reste à la racine.
+- **Architecture hexagonale** : le domaine (`battleships/domain`, les règles et les objets du jeu) ne dépend
+  de rien ; l'application (`battleships/application`, la partie et ses contrats) ne dépend que du domaine ;
+  les clients (`battleships/clients`, aujourd'hui la console) se branchent dessus. Un test vérifie ces dépendances.
 - **Modèle et interface séparés** : les classes du jeu (`Cell`, `Grid`, `Ship`, `Fleet`) ne font
   aucune entrée ni sortie.
 - **Interface injectée** : la partie ne connaît qu'un contrat, `GameView`. La console (`ConsoleUI`)
@@ -87,7 +89,8 @@ Le jeu suit les règles d'origine de la bataille navale ; chaque version les con
 - [x] Qualité du code vérifiée par Ruff, et contrat de documentation
 - [x] Code du jeu regroupé dans un package
 - [x] Interface injectée dans la partie (contrat `GameView`)
-- [ ] Module de règles : toutes les règles du jeu réunies en un seul endroit
+- [x] Module de règles : toutes les règles du jeu réunies en un seul endroit
+- [x] Architecture hexagonale : domaine, application et clients séparés
 - [ ] Partie pilotable tour par tour
 - [ ] Textes centralisés et erreurs typées : le modèle ne contient plus aucun texte d'affichage
 - [ ] Version graphique (pygame), au choix avec la version console

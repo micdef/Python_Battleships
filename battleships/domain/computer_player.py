@@ -2,8 +2,8 @@
 
 import random
 
-from battleships.grid import Grid
-from battleships.player import Player
+from battleships.domain.grid import Grid
+from battleships.domain.player import Player
 
 
 class ComputerPlayer(Player):

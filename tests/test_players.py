@@ -2,11 +2,11 @@
 
 import pytest
 
-from battleships.computer_player import ComputerPlayer
-from battleships.fleet import ShipType
-from battleships.human_player import HumanPlayer
-from battleships.player import Player, ShotResult
-from battleships.rules import Rules
+from battleships.clients.console.human_player import HumanPlayer
+from battleships.domain.computer_player import ComputerPlayer
+from battleships.domain.fleet import ShipType
+from battleships.domain.player import Player, ShotResult
+from battleships.domain.rules import Rules
 
 
 def test_abstract_player_cannot_be_created():

@@ -5,13 +5,13 @@ from itertools import pairwise
 
 import pytest
 
-from battleships.computer_player import ComputerPlayer
-from battleships.fleet import ShipType
-from battleships.game import Game
-from battleships.human_player import HumanPlayer
-from battleships.player import Player, ShotResult
-from battleships.rules import Rules
-from battleships.shot_record import ShotRecord
+from battleships.application.game import Game
+from battleships.clients.console.human_player import HumanPlayer
+from battleships.domain.computer_player import ComputerPlayer
+from battleships.domain.fleet import ShipType
+from battleships.domain.player import Player, ShotResult
+from battleships.domain.rules import Rules
+from battleships.domain.shot_record import ShotRecord
 
 
 @pytest.mark.parametrize("other_rules", [Rules(grid_size=12), Rules(ship_types=(ShipType("Mine", 1),))])

@@ -3,8 +3,8 @@
 from abc import abstractmethod
 from typing import Protocol
 
-from battleships.player import Player
-from battleships.shot_record import ShotRecord
+from battleships.domain.player import Player
+from battleships.domain.shot_record import ShotRecord
 
 
 class GameView(Protocol):

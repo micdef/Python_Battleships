@@ -4,9 +4,9 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-from battleships.fleet import Fleet, ShipType
-from battleships.grid import Grid
-from battleships.rules import CLASSIC_RULES, Rules
+from battleships.domain.fleet import Fleet, ShipType
+from battleships.domain.grid import Grid
+from battleships.domain.rules import CLASSIC_RULES, Rules
 
 
 def test_default_rules_are_the_original_ones():

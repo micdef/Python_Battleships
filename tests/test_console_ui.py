@@ -2,7 +2,7 @@
 
 import pytest
 
-from battleships.console_ui import (
+from battleships.clients.console.ui import (
     ANSI_CODE,
     ConsoleUI,
     format_shot,
@@ -12,10 +12,10 @@ from battleships.console_ui import (
     show_history,
     visible_len,
 )
-from battleships.fleet import Fleet
-from battleships.grid import Grid
-from battleships.player import ShotResult
-from battleships.shot_record import ShotRecord
+from battleships.domain.fleet import Fleet
+from battleships.domain.grid import Grid
+from battleships.domain.player import ShotResult
+from battleships.domain.shot_record import ShotRecord
 
 
 @pytest.mark.parametrize(("text", "expected"), [("B7 H", (6, 1, True)), (" a1   v ", (0, 0, False))])
