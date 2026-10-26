@@ -30,6 +30,9 @@ Le terminal doit interpréter les codes ANSI (couleurs et effacement de l'écran
 l'ancienne console Windows (conhost) ne le fait pas encore, voir la feuille de route.
 
 ## Comment jouer
+
+- **Menu** : `1` pour jouer contre l'ordinateur, `2` pour regarder une partie entre deux ordinateurs
+  (vous choisissez alors la pause entre deux tirs, de 0 à 5 secondes).
 - **Placement** : `A` pour automatique, `M` pour manuel. En manuel, donnez la case de départ
   puis le sens : `B7 H` place le bateau vers la droite, `B7 V` vers le bas.
 - **Tir** : donnez une coordonnée, par exemple `B7`.
@@ -45,8 +48,12 @@ l'ancienne console Windows (conhost) ne le fait pas encore, voir la feuille de r
 
 ## Conception
 
+- **Le jeu est un package** (`battleships/`) ; seul le point d'entrée `main.py` reste à la racine.
 - **Modèle et interface séparés** : les classes du jeu (`Cell`, `Grid`, `Ship`, `Fleet`) ne font
-  aucune entrée ni sortie ; tout le dialogue console est isolé dans `console_ui`.
+  aucune entrée ni sortie.
+- **Interface injectée** : la partie ne connaît qu'un contrat, `GameView`. La console (`ConsoleUI`)
+  déclare le respecter et est donnée à la partie par `main.py` ; une autre interface pourra la remplacer
+  sans modifier la partie.
 - **Polymorphisme** : une classe abstraite `Player`, deux implémentations (`HumanPlayer`,
   `ComputerPlayer`) ; la partie ne sait pas qui est humain.
 - **Contrats vérifiés à chaque couche** et opérations « tout ou rien » : un placement refusé
@@ -54,19 +61,50 @@ l'ancienne console Windows (conhost) ne le fait pas encore, voir la feuille de r
 - **Une seule source de vérité** : « coulé » et « flotte détruite » sont calculés, jamais stockés.
 - **Historique immuable** : chaque coup est un enregistrement figé, exposé en lecture seule.
 
+## Développement
+
+Outils de développement (tests et qualité du code), dans un environnement virtuel :
+
+    python -m pip install -r requirements-dev.txt
+
+Avant chaque commit :
+
+    python -m ruff check --fix
+    python -m ruff format
+    python -m pytest
+
+- **pytest** : plus de 120 tests, dont des tests de régression pour chaque bug corrigé.
+- **Ruff** : style PEP 8, ordre des imports et pièges courants (lignes de 120 caractères).
+- **Contrat de documentation** : un test échoue si un module, une classe ou une fonction n'a pas de docstring.
+
 ## Feuille de route
 
-### V2
-- Couleurs et effacement de l'écran dans l'ancienne console Windows, option sans couleurs
-- Interface console sous forme de classe injectée dans la partie (ouvre la voie à d'autres interfaces)
-- Tests automatisés (pytest)
-- Modes de jeu prédéfinis (taille de grille et flotte)
-- Option « bateaux non adjacents »
-- Mines (avec leur propre comportement)
-- Ordinateur plus malin : il vise autour d'un bateau touché
+Le jeu suit les règles d'origine de la bataille navale ; chaque version les conserve.
 
-### V3
-- Ordinateur qui apprend de ses parties, à partir de l'historique des coups
+### V2 (en cours) : architecture et version graphique
+- [x] Tests automatisés (pytest)
+- [x] Qualité du code vérifiée par Ruff, et contrat de documentation
+- [x] Code du jeu regroupé dans un package
+- [x] Interface injectée dans la partie (contrat `GameView`)
+- [ ] Module de règles : toutes les règles du jeu réunies en un seul endroit
+- [ ] Partie pilotable tour par tour
+- [ ] Textes centralisés et erreurs typées : le modèle ne contient plus aucun texte d'affichage
+- [ ] Version graphique (pygame), au choix avec la version console
+
+### V2.x : versions mineures
+- Ordinateur plus malin, avec trois niveaux de difficulté : facile (au hasard), moyen (vise autour d'un bateau touché) et difficile (déduit le sens du bateau et le suit)
+- Couleurs et effacement de l'écran dans l'ancienne console Windows, option sans couleurs
+- Traduction anglaise
+
+### V3 : client web
+- Jouer à deux depuis un navigateur, en réseau local uniquement (piste : FastAPI et WebSockets)
+
+### V4 : base de données et authentification
+- Parties et joueurs enregistrés, connexion des joueurs
+- Ouverture du jeu en ligne vers l'extérieur, seulement une fois l'authentification en place
+
+### V5 : intelligence artificielle
+- Ordinateur qui apprend des parties enregistrées : niveau de difficulté « expert »
 
 ## Licence
 
