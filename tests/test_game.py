@@ -113,3 +113,91 @@ def test_game_only_needs_a_view_following_the_contract(computer):
     assert view.events[0].startswith("début : ")
     assert view.events[-1] == f"vainqueur : {winner}"
     assert len(view.events) == len(game.history) + 2
+
+
+# --- Partie tour par tour : ce sont les clients qui la font avancer ---
+
+
+@pytest.fixture
+def ready_game(computer, console):
+    """Fabrique une partie entre deux ordinateurs, flottes placées, prête à commencer."""
+
+    def make(**options) -> Game:
+        """Crée la partie ; options est transmis à Game (ex. on_shot=...)."""
+        first, second = computer("A"), computer("B")
+        first.place_fleet()
+        second.place_fleet()
+        return Game(first, second, view=console(), **options)
+
+    return make
+
+
+def test_game_cannot_start_before_both_fleets_are_placed(computer, console):
+    """Pas de premier tir tant qu'une flotte n'est pas entièrement placée."""
+    game = Game(computer("A"), computer("B"), view=console())
+    with pytest.raises(RuntimeError, match="placées"):
+        game.start()
+
+
+def test_game_cannot_start_twice(ready_game):
+    """Le tirage au sort n'est annoncé qu'une fois : une partie ne commence pas deux fois."""
+    game = ready_game()
+    game.start()
+    with pytest.raises(RuntimeError, match="déjà commencé"):
+        game.start()
+
+
+def test_no_shot_before_the_start(ready_game):
+    """Un tir avant le début de la partie est refusé."""
+    with pytest.raises(RuntimeError, match="pas commencé"):
+        ready_game().play_turn(0, 0)
+
+
+def test_a_turn_passes_the_hand_to_the_other_player(ready_game):
+    """Après un tir qui ne termine pas la partie, les rôles de tireur et de cible s'inversent."""
+    game = ready_game()
+    game.start()
+    shooter, target = game.current_shooter, game.current_target
+    record = game.play_turn(0, 0)
+    assert record.shooter == shooter.name
+    assert (game.current_shooter, game.current_target) == (target, shooter)
+
+
+def test_a_refused_shot_does_not_use_the_turn(ready_game):
+    """Une case déjà visée est refusée par le domaine : rien n'est joué, le même joueur garde la main."""
+    game = ready_game()
+    game.start()
+    game.play_turn(0, 0)
+    shooter = game.current_shooter
+    game.play_turn(0, 0)  # l'autre joueur vise la même case : c'est sa grille à lui qui la reçoit
+    game.play_turn(5, 5)
+    with pytest.raises(ValueError, match="déjà été visée"):
+        game.play_turn(0, 0)
+    assert game.current_shooter is shooter
+    assert len(game.history) == 3
+
+
+def test_automatic_turn_is_refused_for_a_human(computer, console):
+    """Seul l'ordinateur joue « tout seul » : pour un humain, c'est le client qui fournit la case."""
+    human, machine = Player("Michaël"), computer("Ordinateur")
+    human.place_fleet()
+    machine.place_fleet()
+    game = Game(human, machine, view=console())
+    game.start()
+    if game.current_shooter is machine:
+        game.play_automatic_turn()
+    with pytest.raises(RuntimeError, match="lui-même"):
+        game.play_automatic_turn()
+
+
+def test_turns_driven_from_outside_reach_a_winner(ready_game):
+    """Une partie menée tour par tour par un client finit par un vainqueur, puis refuse tout tir."""
+    game = ready_game()
+    game.start()
+    assert not game.is_over and game.winner is None
+    while not game.is_over:
+        game.play_automatic_turn()
+    assert game.current_target.is_defeated
+    assert game.winner is game.current_shooter
+    with pytest.raises(RuntimeError, match="finie"):
+        game.play_automatic_turn()

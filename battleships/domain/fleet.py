@@ -45,6 +45,11 @@ class Fleet:
                 self.ships.append(Ship(name, ship_type.length))
 
     @property
+    def is_placed(self) -> bool:
+        """Flotte prête à jouer quand tous ses bateaux sont placés sur la grille."""
+        return all(ship.is_placed for ship in self.ships)
+
+    @property
     def is_destroyed(self) -> bool:
         """Flotte détruite quand tous ses bateaux sont coulés (calculé, jamais stocké)."""
         return all(ship.is_sunk for ship in self.ships)
