@@ -6,7 +6,6 @@ from itertools import pairwise
 import pytest
 
 from battleships.application.game import Game
-from battleships.clients.console.human_player import HumanPlayer
 from battleships.domain.fleet import ShipType
 from battleships.domain.player import Player, ShotResult
 from battleships.domain.rules import Rules
@@ -26,30 +25,31 @@ def test_draw_for_first_shooter_is_fair(computer, console):
     assert 400 < firsts < 600
 
 
-def test_game_ends_with_the_loser_fully_sunk(computer, console, capsys):
+def test_game_ends_with_the_loser_fully_sunk(ready_game, capsys):
     """La partie s’arrête quand toute la flotte d’un joueur est coulée, et annonce le vainqueur."""
-    first, second = computer("A"), computer("B")
-    winner = Game(first, second, view=console()).play()
+    game = ready_game()
+    winner = play_to_the_end(game)
+    first, second = game.players
     loser = second if winner is first else first
     assert loser.is_defeated
     assert not winner.is_defeated
     assert "a gagné" in capsys.readouterr().out
 
 
-def test_history_alternates_shooters_and_ends_with_the_winning_shot(computer, console, capsys):
+def test_history_alternates_shooters_and_ends_with_the_winning_shot(ready_game, capsys):
     """Les joueurs tirent chacun leur tour, et le dernier coup de l’historique est le coup gagnant."""
-    game = Game(computer("A"), computer("B"), view=console())
-    winner = game.play()
+    game = ready_game()
+    winner = play_to_the_end(game)
     shooters = [record.shooter for record in game.history]
     assert all(current != following for current, following in pairwise(shooters))
     assert game.history[-1].shooter == winner.name
     assert game.history[-1].result is ShotResult.SUNK
 
 
-def test_every_hit_names_the_ship_and_every_miss_does_not(computer, console, capsys):
+def test_every_hit_names_the_ship_and_every_miss_does_not(ready_game, capsys):
     """Règlement : le défenseur révèle le bateau dès qu'il est touché ; un tir à l'eau ne nomme rien."""
-    game = Game(computer("A"), computer("B"), view=console())
-    game.play()
+    game = ready_game()
+    play_to_the_end(game)
     for record in game.history:
         if record.result is ShotResult.MISS:
             assert record.ship_name is None
@@ -57,32 +57,22 @@ def test_every_hit_names_the_ship_and_every_miss_does_not(computer, console, cap
             assert record.ship_name
 
 
-def test_history_cannot_be_modified(computer, console, capsys):
+def test_history_cannot_be_modified(ready_game, capsys):
     """L’historique est un journal en lecture seule : aucun coup ne peut être ajouté ni modifié."""
-    game = Game(computer("A"), computer("B"), view=console())
-    game.play()
+    game = ready_game()
+    play_to_the_end(game)
     with pytest.raises(AttributeError):
         game.history.append(game.history[0])
     with pytest.raises(FrozenInstanceError):
         game.history[0].result = ShotResult.SUNK
 
 
-def test_observer_receives_every_shot_in_order(computer, console, capsys):
+def test_observer_receives_every_shot_in_order(ready_game, capsys):
     """L’observateur reçoit chaque tir, dans l’ordre, sans en manquer aucun."""
     seen: list[ShotRecord] = []
-    game = Game(computer("A"), computer("B"), view=console(), on_shot=seen.append)
-    game.play()
+    game = ready_game(on_shot=seen.append)
+    play_to_the_end(game)
     assert seen == list(game.history)
-
-
-def test_scripted_human_can_play_a_whole_game(computer, console, capsys):
-    """Une partie complète contre l’ordinateur va jusqu’au bout avec un joueur au clavier."""
-    every_cell = [f"{chr(ord('A') + col)}{row + 1}" for row in range(10) for col in range(10)]
-    ui = console("A", *every_cell)
-    game = Game(HumanPlayer("Michaël", ui), computer("Ordinateur"), view=ui)
-    winner = game.play()
-    assert winner.name in ("Michaël", "Ordinateur")
-    assert any(record.shooter == "Michaël" for record in game.history)
 
 
 class RecordingView:
@@ -105,11 +95,11 @@ class RecordingView:
         self.events.append(f"vainqueur : {winner}")
 
 
-def test_game_only_needs_a_view_following_the_contract(computer):
+def test_game_only_needs_a_view_following_the_contract(ready_game):
     """La partie ne dépend que du contrat GameView : une interface sans console suffit pour jouer."""
     view = RecordingView()
-    game = Game(computer("A"), computer("B"), view=view)
-    winner = game.play()
+    game = ready_game(view)
+    winner = play_to_the_end(game)
     assert view.events[0].startswith("début : ")
     assert view.events[-1] == f"vainqueur : {winner}"
     assert len(view.events) == len(game.history) + 2
@@ -122,14 +112,22 @@ def test_game_only_needs_a_view_following_the_contract(computer):
 def ready_game(computer, console):
     """Fabrique une partie entre deux ordinateurs, flottes placées, prête à commencer."""
 
-    def make(**options) -> Game:
-        """Crée la partie ; options est transmis à Game (ex. on_shot=...)."""
+    def make(view=None, **options) -> Game:
+        """Crée la partie ; view remplace la console par défaut, options est transmis à Game (ex. on_shot=...)."""
         first, second = computer("A"), computer("B")
         first.place_fleet()
         second.place_fleet()
-        return Game(first, second, view=console(), **options)
+        return Game(first, second, view=view if view is not None else console(), **options)
 
     return make
+
+
+def play_to_the_end(game: Game) -> Player:
+    """Fait jouer deux ordinateurs tour par tour jusqu'à la fin, comme le ferait un client ; renvoie le vainqueur."""
+    game.start()
+    while not game.is_over:
+        game.play_automatic_turn()
+    return game.winner
 
 
 def test_game_cannot_start_before_both_fleets_are_placed(computer, console):
@@ -193,10 +191,8 @@ def test_automatic_turn_is_refused_for_a_human(computer, console):
 def test_turns_driven_from_outside_reach_a_winner(ready_game):
     """Une partie menée tour par tour par un client finit par un vainqueur, puis refuse tout tir."""
     game = ready_game()
-    game.start()
     assert not game.is_over and game.winner is None
-    while not game.is_over:
-        game.play_automatic_turn()
+    play_to_the_end(game)
     assert game.current_target.is_defeated
     assert game.winner is game.current_shooter
     with pytest.raises(RuntimeError, match="finie"):

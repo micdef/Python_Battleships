@@ -48,7 +48,7 @@ class Player:
         return ShotResult.SUNK if cell.ship.is_sunk else ShotResult.HIT
 
     def place_fleet(self) -> None:
-        """Place toute la flotte au hasard (le joueur humain en console redéfinit ce choix)."""
+        """Place toute la flotte au hasard (l'ordinateur toujours, l'humain s'il choisit le placement automatique)."""
         self.grid.place_randomly(self.fleet)
 
     def choose_target(self, enemy_grid: Grid) -> tuple[int, int]:

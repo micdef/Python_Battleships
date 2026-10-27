@@ -97,12 +97,3 @@ class Game:
         if not self._shooter.is_automatic:
             raise RuntimeError(f"{self._shooter} choisit ses tirs lui-même")
         return self.play_turn(*self._shooter.choose_target(self._target.grid))
-
-    def play(self) -> Player:
-        """Joue la partie jusqu'au bout et renvoie le vainqueur (provisoire : la boucle passera chez les clients)."""
-        for player in self.players:
-            player.place_fleet()
-        self.start()
-        while not self.is_over:
-            self.play_turn(*self._shooter.choose_target(self._target.grid))
-        return self._winner
