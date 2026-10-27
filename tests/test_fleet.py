@@ -73,3 +73,13 @@ def test_fleet_is_destroyed_only_when_every_ship_is_sunk():
     assert not fleet.is_destroyed
     grid[0, 2].shoot()
     assert fleet.is_destroyed
+
+
+def test_fleet_is_placed_only_when_every_ship_is():
+    """La flotte n'est prête qu'une fois tous ses bateaux sur la grille."""
+    grid, fleet = Grid(), Fleet((ShipType("Torpilleur", 2), ShipType("Sous-Marin", 3)))
+    assert not fleet.is_placed
+    grid.place(fleet.ships[0], 0, 0, horizontal=True)
+    assert not fleet.is_placed
+    grid.place(fleet.ships[1], 2, 0, horizontal=True)
+    assert fleet.is_placed

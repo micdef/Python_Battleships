@@ -111,3 +111,13 @@ def test_each_console_has_its_own_pending_messages(capsys):
     first.announce_shot(ShotRecord("Ordinateur", "C2", ShotResult.HIT))
     second.refresh_screen(Grid(), Fleet(), Grid())
     assert "Ordinateur tire en C2" not in capsys.readouterr().out
+
+
+def test_ask_target_refuses_invalid_or_already_shot_cells(computer, console, capsys):
+    """Le joueur ne peut viser ni une case hors grille, ni une case déjà visée."""
+    enemy = computer("Cible")
+    enemy.grid[6, 1].shoot()
+    assert console("B7", "Z9", "C3").ask_target(enemy.grid) == (2, 2)
+    output = capsys.readouterr().out
+    assert "B7 a déjà été visée" in output
+    assert "Z9 est hors de la grille" in output

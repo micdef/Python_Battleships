@@ -1,7 +1,7 @@
 """Point d’entrée du jeu (python main.py) : choix du mode, puis lancement de la partie."""
 
 from battleships.application.game import Game
-from battleships.clients.console.human_player import HumanPlayer
+from battleships.clients.console.game_loop import run_game
 from battleships.clients.console.ui import ConsoleUI
 from battleships.domain.player import Player
 from battleships.domain.strategy import RandomStrategy
@@ -13,8 +13,9 @@ if __name__ == "__main__":
         if ui.ask_watch_mode():
             first = Player("Ordinateur 1", strategy=RandomStrategy())
             second = Player("Ordinateur 2", strategy=RandomStrategy())
-            Game(first, second, view=ui, on_shot=ui.spectator_view(first, second, ui.ask_delay())).play()
+            game = Game(first, second, view=ui, on_shot=ui.spectator_view(first, second, ui.ask_delay()))
         else:
-            Game(HumanPlayer(ui.ask_name(), ui), Player("Ordinateur", strategy=RandomStrategy()), view=ui).play()
+            game = Game(Player(ui.ask_name()), Player("Ordinateur", strategy=RandomStrategy()), view=ui)
+        run_game(game, ui)
     except KeyboardInterrupt, EOFError:
         print("\nPartie interrompue")
